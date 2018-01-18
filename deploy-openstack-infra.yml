@@ -1,0 +1,126 @@
+---
+- name: Deploy the OpenShift Cluster
+  hosts: localhost
+  connection: local
+  become: no
+  gather_facts: no
+  vars:
+#    stack_name: openshift
+#    domain_name: ocp3.lab
+#    flavor: m1.small
+#    master_count: 1
+#    infra_count: 1
+#    node_count: 2
+#    master_server_group_policies: ['affinity']
+#    node_server_group_policies: ['affinity']
+#    infra_server_group_policies: ['affinity']
+#    contact: admin@{{ domain_name }}
+  tasks:
+
+    - name: Check whether the stack exists already
+      command: "openstack stack show {{ stack_name }}"
+      ignore_errors: yes
+      register: stack_check
+
+    - name: Create the Heat Stack
+      os_stack:
+        name: "{{ stack_name }}"
+        template: heat/openshift.yaml
+        parameters:
+          domain_name: "{{ domain_name }}"
+          external_network: "{{ external_network }}"
+          ssh_key_name: "{{ ssh_key_name }}"
+          dns_forwarders: "{{ dns_forwarders }}"
+          image: "{{ image }}"
+          bastion_flavor: "{{ bastion_flavor }}"
+          master_flavor: "{{ master_flavor }}"
+          infra_flavor: "{{ infra_flavor }}"
+          node_flavor: "{{ node_flavor }}"
+
+          master_count: "{{ master_count }}"
+          infra_count: "{{ infra_count }}"
+          node_count: "{{ node_count }}"
+          #master_server_group_policies: "{{ master_server_group_policies }}"
+          #master_server_group_policies: affinity
+          #infra_server_group_policies: "{{ infra_server_group_policies }}"
+          #infra_server_group_policies: affinity
+          #node_server_group_policies: "{{ node_server_group_policies }}"
+          #node_server_group_policies: affinity
+      register: stack_output
+      when: stack_check.rc != 0
+
+    - name: Register stack output
+      command: >
+        openstack stack output show -f value -c output_value
+        {{ stack_name }} ip_address
+      register: stack_output_raw
+
+    - set_fact:
+        stack_output: "{{ stack_output_raw.stdout|from_json }}"
+
+    - name: Add the bastion to the inventory
+      add_host:
+        name: "{{ stack_output.bastion.address }}"
+        groups: bastion,openshift
+        zone: "{{ domain_name }}"
+        domain_name: "{{ domain_name }}"
+        contact: "{{ contact }}"
+        ansible_user: "{{ ssh_user }}"
+
+#  - name: Add the masters to the inventory
+#    add_host:
+#      name: "{{ item.address }}"
+#      groups: masters,openshift
+#      zone: "{{ domain_name }}"
+#      domain_name: "{{ domain_name }}"
+#      contact: "{{ contact }}"
+#      ansible_user: "{{ ssh_user }}"
+#    with_items: "{{ stack_output.masters }}"
+
+#  - name: Add the infras to the inventory
+#    add_host:
+#      name: "{{ item.address }}"
+#      groups: infras,openshift
+#      zone: "{{ domain_name }}"
+#      domain_name: "{{ domain_name }}"
+#      contact: "{{ contact }}"
+#      ansible_user: "{{ ssh_user }}"
+#    with_items: "{{ stack_output.infras }}"
+
+#  - name: Add the nodes to the inventory
+#    add_host:
+#      name: "{{ item.address }}"
+#      groups: nodes,openshift
+#      zone: "{{ domain_name }}"
+#      domain_name: "{{ domain_name }}"
+#      contact: "{{ contact }}"
+#      ansible_user: "{{ ssh_user }}"
+#    with_items: "{{ stack_output.nodes }}"
+
+    - name: Check ssh connection on deployed servers
+      wait_for:
+        host: "{{ item }}"
+        port: 22
+      with_items: "{{ groups['all'] }}"
+
+#    - name: Wait 300 seconds for port 22 to become open and contain "OpenSSH"
+#      wait_for:
+#        port: 22
+#        host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+#        search_regex: OpenSSH
+#        delay: 10
+#      vars:
+#        ansible_connection: local
+
+- name: Configure OpenStack Client on Bastion
+  hosts: bastion
+  become: true
+  tasks:
+    - name: Copy OpenStack Credentials to Bastion
+      copy:
+        src: /root/keystonerc_admin
+        dest: /home/cloud-user/keystonerc_admin
+        mode: 0755
+        owner: cloud-user
+
+#- include: playbooks/openshift-node-setup.yml

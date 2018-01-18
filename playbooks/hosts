@@ -1,0 +1,9 @@
+# Ansible managed
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+10.0.1.5  bastion.lab bastion
+10.0.1.10  master0.lab master0
+10.0.1.9  infra0.lab infra0
+10.0.1.15  node1.lab node1
+10.0.1.16  node0.lab node0

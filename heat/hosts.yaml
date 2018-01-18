@@ -1,0 +1,256 @@
+---
+heat_template_version: 2016-10-14
+
+description:
+  An instance for a DNS service made up of a single master and a set of
+  slave services.
+  The instances are created with Heat and then configured with Ansible
+
+parameters:
+  node_count:
+    type: number
+    description: >
+      Number of app nodes to create.
+    default: 2
+
+  infra_count:
+    type: number
+    description: >
+      Number of infra nodes to create.
+    default: 1
+
+  master_count:
+    type: number
+    description: >
+      Number of master nodes to create.
+    default: 1
+
+  bastion_hostname:
+    description: >
+      The default prefix for bastion hostname
+    type: string
+    default: "bastion"
+
+  master_hostname_prefix:
+    description: >
+      The default prefix for master hostnames
+    type: string
+    default: "master"
+
+  infra_hostname_prefix:
+    description: >
+      The default prefix for infra node hostnames
+    type: string
+    default: "infra"
+
+  node_hostname_prefix:
+    description: >
+      The default prefix for app node hostnames
+    type: string
+    default: "node"
+
+  domain_name:
+    description: >
+      All VMs will be placed in this domain
+    type: string
+
+  # Networks to connect to or create
+  external_network:
+    type: string
+    description: >
+      The external network that provides floating IP addresses for the nodes
+    constraints:
+    - custom_constraint: neutron.network
+
+  service_network:
+    description: >
+      The name or ID of the internal network
+    type: string
+    constraints:
+    - custom_constraint: neutron.network
+
+  service_subnet:
+    description: >
+      The name or ID of the internal IPv4 space
+    type: string
+    constraints:
+    - custom_constraint: neutron.subnet
+
+  master_server_group_policies:
+    type: comma_delimited_list
+    description: >
+      List of policies applied on master nodes ServerGroup. By default
+      'anti-affinity' policy is used to make sure that each master node
+      is deployed on a different host. If you use a small/all-in-one openstack
+      environment, you may need to disable this e.g. by passing
+      '-P master_server_group_policies=affinity'.
+    default: ['affinity']
+
+  infra_server_group_policies:
+    type: comma_delimited_list
+    description: >
+      List of policies applied on master nodes ServerGroup. By default
+      'anti-affinity' policy is used to make sure that each master node
+      is deployed on a different host. If you use a small/all-in-one openstack
+      environment, you may need to disable this e.g. by passing
+      '-P infra_server_group_policies=affinity'.
+    default: ['affinity']
+
+  node_server_group_policies:
+    type: comma_delimited_list
+    description: >
+      List of policies applied on master nodes ServerGroup. By default
+      'anti-affinity' policy is used to make sure that each master node
+      is deployed on a different host. If you use a small/all-in-one openstack
+      environment, you may need to disable this e.g. by passing
+      '-P node_server_group_policies=affinity'.
+    default: ['affinity']
+
+  image:
+    description: >
+      The Glance image to use as a base for OpenShift nodes
+    type: string
+    constraints:
+    - custom_constraint: glance.image
+
+  bastion_flavor:
+    description: >
+      The name of the OpenStack instance flavor to use for OpenShift nodes
+    type: string
+    default: m1.small
+    constraints:
+    - custom_constraint: nova.flavor
+
+  master_flavor:
+    description: >
+      The name of the OpenStack instance flavor to use for OpenShift nodes
+    type: string
+    default: m1.medium
+    constraints:
+
+  infra_flavor:
+    description: >
+      The name of the OpenStack instance flavor to use for OpenShift nodes
+    type: string
+    default: m1.large
+    constraints:
+
+  node_flavor:
+    description: >
+      The name of the OpenStack instance flavor to use for OpenShift nodes
+    type: string
+    default: m1.medium
+    constraints:
+
+  # Access to the VMs
+  ssh_user:
+    type: string
+    description: >
+      The SSH user available on all nodes.
+    default: cloud-user
+
+  ssh_key_name:
+    type: string
+    description: Name of the SSH keypair registered with Nova
+    constraints:
+    - custom_constraint: nova.keypair
+
+resources:
+
+  bastion:
+    type: bastion.yaml
+    properties:
+      image: {get_param: image}
+      bastion_flavor: {get_param: bastion_flavor}
+      external_network: {get_param: external_network}
+      service_network: {get_param: service_network}
+      service_subnet: {get_param: service_subnet}
+      security_group: {get_resource: openshift_security_group}
+      hostname: {get_param: bastion_hostname}
+      domain_name: {get_param: domain_name}
+      ssh_user: {get_param: ssh_user}
+      ssh_key_name: {get_param: ssh_key_name}
+
+  masters:
+    type: masters.yaml
+    properties:
+      master_count: {get_param: master_count}
+      image: {get_param: image}
+      master_flavor: {get_param: master_flavor}
+      master_server_group_policies: {get_param: master_server_group_policies}
+      external_network: {get_param: external_network}
+      service_network: {get_param: service_network}
+      service_subnet: {get_param: service_subnet}
+      security_group: {get_resource: openshift_security_group}
+      hostname_prefix: {get_param: master_hostname_prefix}
+      domain_name: {get_param: domain_name}
+      ssh_user: {get_param: ssh_user}
+      ssh_key_name: {get_param: ssh_key_name}
+
+  infras:
+    type: infras.yaml
+    properties:
+      infra_count: {get_param: infra_count}
+      image: {get_param: image}
+      infra_flavor: {get_param: infra_flavor}
+      infra_server_group_policies: {get_param: infra_server_group_policies}
+      external_network: {get_param: external_network}
+      service_network: {get_param: service_network}
+      service_subnet: {get_param: service_subnet}
+      security_group: {get_resource: openshift_security_group}
+      hostname_prefix: {get_param: infra_hostname_prefix}
+      domain_name: {get_param: domain_name}
+      ssh_user: {get_param: ssh_user}
+      ssh_key_name: {get_param: ssh_key_name}
+
+  nodes:
+    type: nodes.yaml
+    properties:
+      node_count: {get_param: node_count}
+      image: {get_param: image}
+      node_flavor: {get_param: node_flavor}
+      node_server_group_policies: {get_param: node_server_group_policies}
+      external_network: {get_param: external_network}
+      service_network: {get_param: service_network}
+      service_subnet: {get_param: service_subnet}
+      security_group: {get_resource: openshift_security_group}
+      hostname_prefix: {get_param: node_hostname_prefix}
+      domain_name: {get_param: domain_name}
+      ssh_user: {get_param: ssh_user}
+      ssh_key_name: {get_param: ssh_key_name}
+
+  openshift_security_group:
+    description: >
+      Define network access to DNS master servers
+      ICMP, SSH, and DNS (TCP and UDP) allowed
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+      - protocol: icmp
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 22
+        port_range_max: 22
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 80
+        port_range_max: 80
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 443
+        port_range_max: 443
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 8443
+        port_range_max: 8443
+
+outputs:
+  bastion_ip_address:
+    value: {get_attr: [bastion, ip_address]}
+  master_entries:
+    value: {get_attr: [masters, entries]}
+  infra_entries:
+    value: {get_attr: [infras, entries]}
+  node_entries:
+    value: {get_attr: [nodes, entries]}
+

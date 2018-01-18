@@ -1,0 +1,127 @@
+---
+heat_template_version: 2016-10-14
+
+description:
+  An instance for a OpenShift infra node
+  The instances are created with Heat and then configured with Ansible
+
+parameters:
+  infra_count:
+    type: number
+    description: >
+      Number of slave servers to create.
+    default: 1
+
+  hostname_prefix:
+    description: >
+      The default prefix for slave server hostnames
+    type: string
+    default: "infra"
+
+  domain_name:
+    description: >
+      All VMs will be placed in this domain
+    type: string
+
+  # Connectivity
+  external_network:
+    type: string
+    description: >
+      The external network that provides floating IP addresses for the infra nodes
+    constraints:
+    - custom_constraint: neutron.network
+
+  service_network:
+    description: >
+      The name or ID of the internal network
+    type: string
+    constraints:
+    - custom_constraint: neutron.network
+
+  service_subnet:
+    description: >
+      The name or ID of the internal IPv4 space
+    type: string
+    constraints:
+    - custom_constraint: neutron.subnet
+
+  security_group:
+    description: >
+      Allow OpenShift service access to instances
+    type: string
+    constraints:
+    - custom_constraint: neutron.security_group
+
+  infra_server_group_policies:
+    type: comma_delimited_list
+    description: >
+      List of policies applied on infra nodes ServerGroup. By default
+      'anti-affinity' policy is used to make sure that each infra node
+      is deployed on a different host. If you use a small/all-in-one openstack
+      environment, you may need to disable this e.g. by passing
+      '-P master_server_group_policies=affinity'.
+    default: ['affinity']
+
+  image:
+    description: >
+      The Glance image to use as a base for OpenShift servers
+    type: string
+    constraints:
+    - custom_constraint: glance.image
+
+  infra_flavor:
+    description: >
+      The name of the OpenStack instance flavor to use for OpenShift servers
+    type: string
+    default: m1.medium
+    constraints:
+    - custom_constraint: nova.flavor
+
+  # Access to the VMs
+  ssh_user:
+    type: string
+    description: >
+      The SSH user available on all nodes.
+    default: cloud-user
+
+  ssh_key_name:
+    type: string
+    description: Name of the SSH keypair registered with Nova
+    constraints:
+    - custom_constraint: nova.keypair
+
+resources:
+
+  infras:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: {get_param: infra_count}
+      resource_def:
+        type: infra.yaml
+        properties:
+          image: {get_param: image}
+          flavor: {get_param: infra_flavor}
+          external_network: {get_param: external_network}
+          service_network: {get_param: service_network}
+          service_subnet: {get_param: service_subnet}
+          security_group: {get_param: security_group}
+          hostname:
+            str_replace:
+              template: "%prefix%%index%"
+              params:
+                '%prefix%': {get_param: hostname_prefix}
+          domain_name: {get_param: domain_name}
+          ssh_user: {get_param: ssh_user}
+          ssh_key_name: {get_param: ssh_key_name}
+          server_group: {get_resource: infra_server_group}
+
+  infra_server_group:
+    type: OS::Nova::ServerGroup
+    properties:
+      name: infra_server_group
+      policies: {get_param: infra_server_group_policies}
+
+
+outputs:
+  entries:
+    value: {get_attr: [infras, entry]}

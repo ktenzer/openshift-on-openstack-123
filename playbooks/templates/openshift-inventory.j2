@@ -1,0 +1,83 @@
+# Create an OSEv3 group that contains the masters and nodes groups
+[OSEv3:children]
+masters
+nodes
+nfs
+
+# Set variables common for all OSEv3 hosts
+[OSEv3:vars]
+# SSH user, this user should allow ssh based auth without requiring a password
+ansible_ssh_user=root
+
+# OpenShift Deployment, enterprise of course!
+openshift_deployment_type=openshift-enterprise
+
+# Set Domain for Apps
+openshift_master_default_subdomain=apps.lab
+
+# Enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+
+# Set networking to multi-tenant
+os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
+
+# Disable disk and memory checks
+openshift_disable_check=disk_availability,memory_availability
+
+# Deploy router
+openshift_hosted_manage_router=true
+openshift_router_selector='region=infra'
+
+# Deploy Registry
+openshift_hosted_manage_registry=true
+openshift_registry_selector='region=infra'
+openshift_hosted_registry_storage_kind=nfs
+openshift_hosted_registry_storage_access_modes=['ReadWriteMany']
+openshift_hosted_registry_storage_nfs_directory=/exports
+openshift_hosted_registry_storage_nfs_options='*(rw,root_squash)'
+openshift_hosted_registry_storage_volume_name=registry
+openshift_hosted_registry_storage_volume_size=10Gi
+
+# Deploy logging
+openshift_logging_install_logging=true
+openshift_logging_storage_kind=nfs
+openshift_logging_storage_access_modes=['ReadWriteOnce']
+openshift_logging_storage_nfs_directory=/exports
+openshift_logging_storage_nfs_options='*(rw,root_squash)'
+openshift_logging_storage_volume_name=logging
+openshift_logging_storage_volume_size=10Gi
+
+# Deploy Metrics
+openshift_metrics_install_metrics=true
+openshift_metrics_storage_kind=nfs
+openshift_metrics_storage_access_modes=['ReadWriteOnce']
+openshift_metrics_storage_nfs_directory=/exports
+openshift_metrics_storage_nfs_options='*(rw,root_squash)'
+openshift_metrics_storage_volume_name=metrics
+openshift_metrics_storage_volume_size=10Gi
+
+# Deploy Service Catalog
+openshift_enable_service_catalog=true
+
+# ETCD Storage
+openshift_hosted_etcd_storage_kind=nfs
+openshift_hosted_etcd_storage_nfs_options="*(rw,root_squash,sync,no_wdelay)"
+openshift_hosted_etcd_storage_nfs_directory=/exports/etcd 
+openshift_hosted_etcd_storage_volume_name=etcd-vol2 
+openshift_hosted_etcd_storage_access_modes=["ReadWriteOnce"]
+openshift_hosted_etcd_storage_volume_size=1G
+openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
+
+[nfs]
+master0.ocp3.lab 
+
+# host group for masters
+[masters]
+master0.ocp3.lab 
+
+# host group for nodes, includes region info
+[nodes]
+master0.ocp3.lab openshift_schedulable=False
+infra0.ocp3.lab openshift_schedulable=True openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
+node0.ocp3.lab openshift_schedulable=True openshift_node_labels="{'region': 'primary', 'zone': 'test'}"
+node1.ocp3.lab openshift_schedulable=True openshift_node_labels="{'region': 'primary', 'zone': 'test'}"
