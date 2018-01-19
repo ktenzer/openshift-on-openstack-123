@@ -1,11 +1,3 @@
-rhn_username: <user>
-rhn_password: <password>
-rhn_pool: <pool>
-docker_version: 1.12.6
-stack_name: openshift
-domain_name: ocp3.lab
-ssh_user: cloud-user
-contact: admin@{{ domain_name }}
 packages:
   - wget
   - git
@@ -17,14 +9,16 @@ packages:
   - kexec-tools
   - sos
   - psacct
-packages_bastion:
+packages_bastion_openshift:
   - atomic-openshift-utils
   - atomic-openshift-clients
+packages_bastion_openstack:
+  - python-openstackclient
+  - python-heatclient
 repos:
   - rhel-7-server-rpms
   - rhel-7-server-extras-rpms
   - rhel-7-server-ose-3.7-rpms
   - rhel-7-fast-datapath-rpms
 repos_bastion:
-  - rhel-7-server-optional-rpms
-  - rhel-7-server-rh-common-rpms  
+  - rhel-7-server-openstack-12-tools-rpms

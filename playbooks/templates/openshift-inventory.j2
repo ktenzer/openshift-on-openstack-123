@@ -1,19 +1,32 @@
 # Create an OSEv3 group that contains the masters and nodes groups
 [OSEv3:children]
 masters
+etcd
 nodes
 nfs
 
 # Set variables common for all OSEv3 hosts
 [OSEv3:vars]
 # SSH user, this user should allow ssh based auth without requiring a password
-ansible_ssh_user=root
+ansible_ssh_user={{ ssh_user }}
+ansible_become=yes
 
 # OpenShift Deployment, enterprise of course!
 openshift_deployment_type=openshift-enterprise
+containerized=false
+os_firewall_use_firewalld=True
 
 # Set Domain for Apps
-openshift_master_default_subdomain=apps.lab
+openshift_master_default_subdomain=apps.{{ hostvars['master0'].address }}.xip.io
+
+# default project node selector
+osm_default_node_selector='region=primary'
+
+# Native high availability cluster method with optional load balancer.
+#openshift_master_cluster_method=native
+openshift_master_cluster_hostname=master0
+openshift_master_cluster_public_hostname=master0.{{ hostvars['master0'].address }}.xip.io
+openshift_override_hostname_check=true
 
 # Enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
@@ -21,16 +34,25 @@ openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 
 # Set networking to multi-tenant
 os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
 
+# Configure SDN cluster network and kubernetes service CIDR blocks. These
+# network blocks should be private and should not conflict with network blocks
+# in your infrastructure that pods may require access to. Can not be changed
+# after deployment.
+osm_cluster_network_cidr=10.1.0.0/16
+openshift_portal_net=172.30.0.0/16
+osm_host_subnet_length=8
+
 # Disable disk and memory checks
 openshift_disable_check=disk_availability,memory_availability
 
 # Deploy router
 openshift_hosted_manage_router=true
-openshift_router_selector='region=infra'
+openshift_hosted_router_selector='region=infra'
 
 # Deploy Registry
 openshift_hosted_manage_registry=true
 openshift_registry_selector='region=infra'
+openshift_hosted_registry_replicas=1
 openshift_hosted_registry_storage_kind=nfs
 openshift_hosted_registry_storage_access_modes=['ReadWriteMany']
 openshift_hosted_registry_storage_nfs_directory=/exports
@@ -56,6 +78,9 @@ openshift_metrics_storage_nfs_options='*(rw,root_squash)'
 openshift_metrics_storage_volume_name=metrics
 openshift_metrics_storage_volume_size=10Gi
 
+# OpenShift Template Service Broker
+openshift_template_service_broker_namespaces=['openshift']
+
 # Deploy Service Catalog
 openshift_enable_service_catalog=true
 
@@ -75,9 +100,11 @@ master0.ocp3.lab
 [masters]
 master0.ocp3.lab 
 
+# host group for etcd
+[etcd]
+master0.ocp3.lab 
+
 # host group for nodes, includes region info
 [nodes]
 master0.ocp3.lab openshift_schedulable=False
-infra0.ocp3.lab openshift_schedulable=True openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
-node0.ocp3.lab openshift_schedulable=True openshift_node_labels="{'region': 'primary', 'zone': 'test'}"
-node1.ocp3.lab openshift_schedulable=True openshift_node_labels="{'region': 'primary', 'zone': 'test'}"
+infra0.ocp3.lab openshift_schedulable=True openshift_node_labels="{'region': 'infra', 'zone': 'default', 'fluentd': 'true'}"

@@ -3,18 +3,8 @@
   hosts: localhost
   connection: local
   gather_facts: yes
-  vars:
-#    stack_name: openshift
-#    domain_name: ocp3.lab
-#    ssh_user: cloud-user
-#    flavor: m1.small
-#    master_count: 1
-#    infra_count: 1
-#    node_count: 2
-#    master_server_group_policies: ['affinity']
-#    node_server_group_policies: ['affinity']
-#    infra_server_group_policies: ['affinity']
-#    contact: admin@{{ domain_name }}
+  vars_files:
+    - vars.yml
   tasks:
 
     - name: Check whether the stack exists already
@@ -32,65 +22,63 @@
 
     - name: Add the bastion to the inventory
       add_host:
-        name: "{{ stack_output.bastion.address }}"
+        name: "{{ stack_output.bastion.name }}"
+        hostname: "{{ stack_output.bastion.address }}"
         groups: bastion,all
         zone: "{{ domain_name }}"
         domain_name: "{{ domain_name }}"
         contact: "{{ contact }}"
         ansible_user: "{{ ssh_user }}"
-        #ansible_ip: "{{ ansible_eth0.ipv4.address }}"
+        ip_addr: "{{ stack_output.bastion.address }}"
         ansible_nodename: "{{ ansible_nodename }}"
 
     - name: Add the masters to the inventory
       add_host:
-        name: "{{ item.address }}"
+        name: "{{ item.name }}"
+        hostname: "{{ item.address }}"
         groups: masters,all,openshift
         zone: "{{ domain_name }}"
         domain_name: "{{ domain_name }}"
         contact: "{{ contact }}"
         ansible_user: "{{ ssh_user }}"
-        #ansible_ip: "{{ ansible_eth0.ipv4.address }}"
+        ip_addr: "{{ item.address }}"
         ansible_nodename: "{{ ansible_nodename }}"
       with_items: "{{ stack_output.masters }}"
 
     - name: Add the infras to the inventory
       add_host:
-        name: "{{ item.address }}"
+        name: "{{ item.name }}"
+        hostname: "{{ item.address }}"
         groups: infras,all,openshift
         zone: "{{ domain_name }}"
         domain_name: "{{ domain_name }}"
         contact: "{{ contact }}"
         ansible_user: "{{ ssh_user }}"
-        #ansible_ip: "{{ ansible_eth0.ipv4.address }}"
+        ip_addr: "{{ item.address }}"
         ansible_nodename: "{{ ansible_nodename }}"
       with_items: "{{ stack_output.infras }}"
 
     - name: Add the nodes to the inventory
       add_host:
-        name: "{{ item.address }}"
+        name: "{{ item.name }}"
+        hostname: "{{ item.address }}"
         groups: nodes,all,openshift
         zone: "{{ domain_name }}"
         domain_name: "{{ domain_name }}"
         contact: "{{ contact }}"
         ansible_user: "{{ ssh_user }}"
-        #ansible_ip: "{{ ansible_eth0.ipv4.address }}"
+        ip_addr: "{{ item.address }}"
         ansible_nodename: "{{ ansible_nodename }}"
       with_items: "{{ stack_output.nodes }}"
 
-#    - name: Wait for the deployed servers
-#      wait_for:
-#        host: "{{ item }}"
-#        port: 22
-#      with_items: "{{ groups['all'] }}"
-
-#    - name: Wait 300 seconds for port 22 to become open and contain "OpenSSH"
-#      wait_for:
-#        port: 22
-#        host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
-#        search_regex: OpenSSH
-#        delay: 10
-#      vars:
-#        ansible_connection: local
-#      with_items: "{{ groups['all'] }}"
+    - name: Wait 300 seconds for port 22 to become open and contain "OpenSSH"
+      wait_for:
+        port: 22
+        host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+        search_regex: OpenSSH
+        delay: 10
+      vars:
+        ansible_connection: local
+      with_items: "{{ groups['all'] }}"
 
 - include: openshift-node-setup.yml

@@ -106,6 +106,19 @@ resources:
       - subnet: {get_param: service_subnet}
       replacement_policy: AUTO
 
+  cinder_volume:
+    type: OS::Cinder::Volume
+    properties:
+      size: 25
+      availability_zone: nova
+
+  volume_attachment:
+    type: OS::Cinder::VolumeAttachment
+    properties:
+      volume_id: { get_resource: cinder_volume }
+      instance_uuid: { get_resource: host }
+      mountpoint: /dev/vdc
+
   init:
     type: OS::Heat::MultipartMime
     properties:

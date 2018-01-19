@@ -3,6 +3,8 @@
   hosts: all
   gather_facts: yes
   become: yes
+  vars_files:
+    - vars.yml
   tasks:
 
     - name: Build hosts file with all hosts
@@ -76,6 +78,8 @@
   hosts: openshift
   gather_facts: true
   become: true
+  vars_files:
+    - vars.yml
   tasks:
 
     - name: Install Docker {{ docker_version }}
@@ -111,21 +115,16 @@
         enabled: yes
         state: started
 
-#- name: Setup Bastion
-#  hosts: bastion
-#  become: true
-#  tasks:
-#
-#    - name: Install Required Packages for Bastion
-#      yum: 
-#        name: "{{item}}"
-#        state: installed
-#      with_items: "{{packages_bastion}}"
-#
-#    - name: Setup OpenShift inventory file
-#      template:
-#        src: templates/openshift-inventory.j2
-#        dest: /etc/ansible/hosts
-#        owner: root
-#        group: root
-#        mode: 0755
+- name: Configure OpenShift inventory file
+  hosts: bastion
+  gather_facts: true
+  become: true
+  vars_files:
+    - vars.yml
+  tasks:
+
+    - name: Configure nodes dynamically
+      lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
+        line="{{ item }}.{{ domain_name }} openshift_schedulable=True openshift_node_labels=\"{'region'{{ ":" }} 'primary', 'zone'{{ ":" }} 'test', 'fluentd'{{ ":" }} 'true'}\""
+        insertafter="^#?infra0.ocp3.lab"
+      with_items: "{{ groups['nodes'] }}"
