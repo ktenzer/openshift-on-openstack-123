@@ -93,18 +93,14 @@ openshift_hosted_etcd_storage_access_modes=["ReadWriteOnce"]
 openshift_hosted_etcd_storage_volume_size=1G
 openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
 
+# nfs server
 [nfs]
-master0.ocp3.lab 
 
 # host group for masters
 [masters]
-master0.ocp3.lab 
 
 # host group for etcd
 [etcd]
-master0.ocp3.lab 
 
 # host group for nodes, includes region info
 [nodes]
-master0.ocp3.lab openshift_schedulable=False
-infra0.ocp3.lab openshift_schedulable=True openshift_node_labels="{'region': 'infra', 'zone': 'default', 'fluentd': 'true'}"

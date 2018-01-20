@@ -6,7 +6,6 @@
   vars_files:
     - vars.yml
   tasks:
-
     - name: Build hosts file with all hosts
       lineinfile: 
         dest=templates/hosts.j2
@@ -119,12 +118,43 @@
   hosts: bastion
   gather_facts: true
   become: true
+  vars:
+    master_regex: "master{{ master_count - 1 }}.{{ domain_name }} openshift_schedulable=False"
+    infra_regex: "infra{{ infra_count - 1 }}.{{ domain_name }} openshift_schedulable=True"
   vars_files:
     - vars.yml
   tasks:
+    - name: Configure nfs server
+      lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
+        line="master0.{{ domain_name }} server_type=\"nfs\""
+        insertafter="^#?\[nfs\]"
 
-    - name: Configure nodes dynamically
+    - name: Configure masters dynamically
+      lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
+        line="{{ item }}.{{ domain_name }} server_type=\"master\""
+        insertafter="^#?\[masters\]"
+      with_items: "{{ groups['masters'] }}"
+
+    - name: Configure etcd nodes dynamically
+      lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
+        line="{{ item }}.{{ domain_name }} server_type=\"etcd\""
+        insertafter="^#?\[etcd\]"
+      with_items: "{{ groups['masters'] }}"
+
+    - name: Configure master nodes dynamically
+      lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
+        line="{{ item }}.{{ domain_name }} openshift_schedulable=False"
+        insertafter="^#?\[nodes\]"
+      with_items: "{{ groups['masters'] }}"
+
+    - name: Configure infra nodes dynamically
+      lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
+        line="{{ item }}.{{ domain_name }} openshift_schedulable=True openshift_node_labels=\"{'region'{{ ":" }} 'infra', 'zone'{{ ":" }} 'test', 'fluentd'{{ ":" }} 'true'}\""
+        insertafter="^#?{{ master_regex }}"
+      with_items: "{{ groups['infras'] }}"
+
+    - name: Configure app nodes dynamically
       lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
         line="{{ item }}.{{ domain_name }} openshift_schedulable=True openshift_node_labels=\"{'region'{{ ":" }} 'primary', 'zone'{{ ":" }} 'test', 'fluentd'{{ ":" }} 'true'}\""
-        insertafter="^#?infra0.ocp3.lab"
+        insertafter="^#?{{ infra_regex }}"
       with_items: "{{ groups['nodes'] }}"
