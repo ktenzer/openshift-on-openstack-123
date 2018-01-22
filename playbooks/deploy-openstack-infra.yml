@@ -1,5 +1,7 @@
 ---
-- name: Deploy the OpenShift Cluster
+- import_playbook: validate-parameters.yml
+
+- name: Deploy the OpenShift Cluster Infrastructure
   hosts: localhost
   connection: local
   become: no

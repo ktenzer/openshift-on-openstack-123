@@ -1,4 +1,6 @@
 ---
+- import_playbook: validate-parameters.yml
+
 - name: Deploy the OpenShift Cluster
   hosts: localhost
   connection: local
@@ -71,4 +73,4 @@
         ansible_nodename: "{{ ansible_nodename }}"
       with_items: "{{ stack_output.nodes }}"
 
-- include: openshift-node-setup.yml
+- import_playbook: openshift-node-setup.yml
