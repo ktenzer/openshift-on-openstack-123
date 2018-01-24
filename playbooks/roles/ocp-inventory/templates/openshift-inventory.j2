@@ -17,7 +17,7 @@ containerized=false
 os_firewall_use_firewalld=True
 
 # Set Domain for Apps
-openshift_master_default_subdomain=apps.{{ hostvars['master0'].address }}.xip.io
+openshift_master_default_subdomain=apps.{{ hostvars['master0']['floatingip'] }}.xip.io
 
 # default project node selector
 osm_default_node_selector='region=primary'
@@ -25,7 +25,7 @@ osm_default_node_selector='region=primary'
 # Native high availability cluster method with optional load balancer.
 #openshift_master_cluster_method=native
 openshift_master_cluster_hostname=master0
-openshift_master_cluster_public_hostname=master0.{{ hostvars['master0'].address }}.xip.io
+openshift_master_cluster_public_hostname=master0.{{ hostvars['master0']['floatingip'] }}.xip.io
 openshift_override_hostname_check=true
 
 # Enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider

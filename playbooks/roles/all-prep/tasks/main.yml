@@ -1,0 +1,69 @@
+- name: Copy hosts file from template
+  template:
+    src: templates/hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Copy hosts file from template
+  template:
+    src: templates/hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644
+
+- name: check if host already registered
+  command: subscription-manager list --available --match-installed --matches=*Openshift* --pool-only
+  register: subs_result
+  failed_when: false
+  changed_when: "'This system is not yet registered' in subs_result.stderr"
+
+- name: Register hosts
+  command: subscription-manager register --username={{ rhn_username }} --password={{ rhn_password }}
+  retries: 5
+  delay: 5
+  when: subs_result.changed
+
+- name: Check Red Hat subscription
+  redhat_subscription:
+    state: present
+    username: "{{ rhn_username }}"
+    password: "{{ rhn_password }}"
+    pool: "{{ rhn_pool }}"
+    #force_register: yes
+  register: subscribe
+  retries: 5
+  delay: 5
+
+- debug:
+    msg: "{{subscribe}}"
+
+- name: Disable all repos
+  shell: |
+    subscription-manager repos --disable=*
+  retries: 5
+  delay: 5
+  when: subscribe.changed
+
+- name: Enable correct repos
+  command: "subscription-manager repos --enable={{item}}"
+  when: subscribe.changed
+  retries: 5
+  delay: 5
+  with_items: "{{repos}}"
+
+- name: Ensure that required packages are present on target hosts
+  yum:
+    name: "{{item}}"
+    state: latest
+  retries: 5
+  delay: 5
+  with_items: "{{packages}}"
+
+- name: Install Required Packages
+  yum:
+    name: "{{item}}"
+    state: installed
+  with_items: "{{packages}}"

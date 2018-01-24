@@ -177,7 +177,7 @@ resources:
       master_count: {get_param: master_count}
       image: {get_param: image}
       master_flavor: {get_param: master_flavor}
-      master_server_group_policies: {get_param: master_server_group_policies}
+      #master_server_group_policies: {get_param: master_server_group_policies}
       external_network: {get_param: external_network}
       service_network: {get_param: service_network}
       service_subnet: {get_param: service_subnet}
@@ -193,7 +193,7 @@ resources:
       infra_count: {get_param: infra_count}
       image: {get_param: image}
       infra_flavor: {get_param: infra_flavor}
-      infra_server_group_policies: {get_param: infra_server_group_policies}
+      #infra_server_group_policies: {get_param: infra_server_group_policies}
       external_network: {get_param: external_network}
       service_network: {get_param: service_network}
       service_subnet: {get_param: service_subnet}
@@ -209,7 +209,7 @@ resources:
       node_count: {get_param: node_count}
       image: {get_param: image}
       node_flavor: {get_param: node_flavor}
-      node_server_group_policies: {get_param: node_server_group_policies}
+      #node_server_group_policies: {get_param: node_server_group_policies}
       external_network: {get_param: external_network}
       service_network: {get_param: service_network}
       service_subnet: {get_param: service_subnet}
@@ -242,7 +242,7 @@ resources:
       - direction: ingress
         protocol: tcp
         port_range_min: 8443
-        port_range_max: 8443
+        port_range_max: 8444
       - direction: ingress
         protocol: tcp
         port_range_min: 111
@@ -287,6 +287,42 @@ resources:
         protocol: udp
         port_range_min: 32769
         port_range_max: 32769
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 53
+        port_range_max: 53
+      - direction: ingress
+        protocol: udp
+        port_range_min: 53
+        port_range_max: 53
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 1936
+        port_range_max: 1936
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 7001
+        port_range_max: 7001
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 4001
+        port_range_max: 4001
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 10250
+        port_range_max: 10250
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 24224
+        port_range_max: 24224
+      - direction: ingress
+        protocol: udp
+        port_range_min: 4789
+        port_range_max: 4789
+      - direction: ingress
+        protocol: udp
+        port_range_min: 28224
+        port_range_max: 28224
 
 outputs:
   bastion_ip_address:

@@ -1,0 +1,42 @@
+---
+- name: Inventory OpenShift Nodes
+  hosts: localhost
+  connection: local
+  become: no
+  gather_facts: no
+  vars_files:
+    - vars.yml
+
+  tasks:
+  - import_role:
+      name: osp-inventory
+
+- name: Setup All OpenShift Nodes
+  hosts: all
+  gather_facts: yes
+  become: yes
+  vars_files:
+    - vars.yml
+  tasks:
+  - import_role:
+      name: all-prep
+
+- name: Setup All OpenShift Nodes
+  hosts: openshift
+  gather_facts: true
+  become: true
+  vars_files:
+    - vars.yml
+  tasks:
+  - import_role:
+      name: docker-prep
+
+- name: Configure OpenShift inventory file
+  hosts: bastion
+  gather_facts: true
+  become: true
+  vars_files:
+    - vars.yml
+  tasks:
+  - import_role:
+      name: ocp-inventory

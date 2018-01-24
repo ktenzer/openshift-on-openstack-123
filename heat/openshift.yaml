@@ -172,9 +172,9 @@ resources:
       master_hostname_prefix: {get_param: master_hostname_prefix}
       infra_hostname_prefix: {get_param: infra_hostname_prefix}
       node_hostname_prefix: {get_param: node_hostname_prefix}
-      master_server_group_policies: {get_param: master_server_group_policies}
-      infra_server_group_policies: {get_param: infra_server_group_policies}
-      node_server_group_policies: {get_param: node_server_group_policies}
+      #master_server_group_policies: {get_param: master_server_group_policies}
+      #infra_server_group_policies: {get_param: infra_server_group_policies}
+      #node_server_group_policies: {get_param: node_server_group_policies}
       domain_name: {get_param: domain_name}
       master_count: {get_param: master_count}
       infra_count: {get_param: infra_count}
