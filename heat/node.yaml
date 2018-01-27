@@ -76,6 +76,7 @@ parameters:
     - custom_constraint: nova.keypair
 
 resources:
+
   host:
     type: OS::Nova::Server
     properties:

@@ -2,7 +2,7 @@
 heat_template_version: 2016-10-14
 
 description:
-  A simple network to host other services
+  A network to host OpenShift SDN
 
 parameters:
   # Networks to connect to or create
@@ -29,6 +29,10 @@ parameters:
     type: comma_delimited_list
     description: Addresses of a dns nameserver reachable in your environment
 
+  router_id:
+    type: string
+    description: The existing router id
+
 resources:
 
   # Network Components
@@ -53,28 +57,18 @@ resources:
           params:
             "{{prefix}}": {get_param: network_name_prefix}
 
-  external_router:
-    type: OS::Neutron::Router
-    properties:
-      external_gateway_info:
-        network: {get_param: external_network}
-      name:
-        str_replace:
-          template: "{{prefix}}-router"
-          params:
-            "{{prefix}}": {get_param: network_name_prefix}
-
   external_router_interface:
     type: OS::Neutron::RouterInterface
     properties:
-      router_id: {get_resource: external_router}
+      #router_id: {get_resource: external_router}
+      router_id: {get_param: router_id}
       subnet: {get_resource: service_subnet}
 
 outputs:
-  dns_network:
-    description: The network that carries the DNS service traffic
+  openshift_network:
+    description: The network that carries OpenShift traffic
     value: {get_resource: service_network}
 
-  dns_subnet:
-    description: The subnet that carries the DNS service traffic
+  openshift_subnet:
+    description: The subnet that carries OpenShift traffic
     value: {get_resource: service_subnet}

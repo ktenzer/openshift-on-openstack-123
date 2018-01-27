@@ -60,7 +60,7 @@ parameters:
       is deployed on a different host. If you use a small/all-in-one openstack
       environment, you may need to disable this e.g. by passing
       '-P master_server_group_policies=affinity'.
-    default: ['affinity']
+    default: ['anti-affinity']
 
   image:
     description: >

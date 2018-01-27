@@ -15,9 +15,19 @@ parameters:
     constraints:
     - custom_constraint: neutron.network
 
+  service_subnet_cidr:
+    type: string
+    description: >
+      The subnet used for instance to instance communication
+    default: 10.0.1.0/24
+
   dns_forwarders:
     type: comma_delimited_list
     description: Addresses of a dns nameserver reachable in your environment
+
+  router_id:
+    type: string
+    description: The existing router id
 
   bastion_hostname:
     description: >
@@ -74,7 +84,7 @@ parameters:
       is deployed on a different host. If you use a small/all-in-one openstack
       environment, you may need to disable this e.g. by passing
       '-P master_server_group_policies=affinity'.
-    default: ['affinity']
+    default: ['anti-affinity']
 
   infra_server_group_policies:
     type: comma_delimited_list
@@ -84,7 +94,7 @@ parameters:
       is deployed on a different host. If you use a small/all-in-one openstack
       environment, you may need to disable this e.g. by passing
       '-P infra_server_group_policies=affinity'.
-    default: ['affinity']
+    default: ['anti-affinity']
 
   node_server_group_policies:
     type: comma_delimited_list
@@ -94,7 +104,7 @@ parameters:
       is deployed on a different host. If you use a small/all-in-one openstack
       environment, you may need to disable this e.g. by passing
       '-P node_server_group_policies=affinity'.
-    default: ['affinity']
+    default: ['anti-affinity']
 
   image:
     description: >
@@ -154,15 +164,17 @@ resources:
     type: network.yaml
     properties:
       external_network: {get_param: external_network}
+      service_subnet_cidr: {get_param:  service_subnet_cidr}
       dns_nameservers: {get_param: dns_forwarders}
+      router_id: {get_param: router_id}
 
   hosts:
     depends_on: [network]
     type: hosts.yaml
     properties:
       external_network: {get_param: external_network}
-      service_network: {get_attr: [network, dns_network]}
-      service_subnet: {get_attr: [network, dns_subnet]}
+      service_network: {get_attr: [network, openshift_network]}
+      service_subnet: {get_attr: [network, openshift_subnet]}
       image: {get_param: image}
       bastion_flavor: {get_param: bastion_flavor}
       master_flavor: {get_param: master_flavor}
@@ -172,9 +184,9 @@ resources:
       master_hostname_prefix: {get_param: master_hostname_prefix}
       infra_hostname_prefix: {get_param: infra_hostname_prefix}
       node_hostname_prefix: {get_param: node_hostname_prefix}
-      #master_server_group_policies: {get_param: master_server_group_policies}
-      #infra_server_group_policies: {get_param: infra_server_group_policies}
-      #node_server_group_policies: {get_param: node_server_group_policies}
+      master_server_group_policies: {get_param: master_server_group_policies}
+      infra_server_group_policies: {get_param: infra_server_group_policies}
+      node_server_group_policies: {get_param: node_server_group_policies}
       domain_name: {get_param: domain_name}
       master_count: {get_param: master_count}
       infra_count: {get_param: infra_count}

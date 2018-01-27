@@ -1,0 +1,12 @@
+---
+- name: Deploy the OpenShift Cluster Infrastructure
+  hosts: localhost
+  connection: local
+  become: no
+  gather_facts: no
+  vars_files:
+    - vars.yml
+
+  tasks:
+  - import_role:
+      name: osp-stack-update

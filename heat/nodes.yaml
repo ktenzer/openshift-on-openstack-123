@@ -59,8 +59,8 @@ parameters:
       'anti-affinity' policy is used to make sure that each node
       is deployed on a different host. If you use a small/all-in-one openstack
       environment, you may need to disable this e.g. by passing
-      '-P master_server_group_policies=affinity'.
-    default: ['affinity']
+      '-P node_server_group_policies=affinity'.
+    default: ['anti-affinity']
 
   image:
     description: >
@@ -120,7 +120,6 @@ resources:
     properties:
       name: node_server_group
       policies: {get_param: node_server_group_policies}
-
 
 outputs:
   entries:

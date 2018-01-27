@@ -84,7 +84,7 @@ parameters:
       is deployed on a different host. If you use a small/all-in-one openstack
       environment, you may need to disable this e.g. by passing
       '-P master_server_group_policies=affinity'.
-    default: ['affinity']
+    default: ['anti-affinity']
 
   infra_server_group_policies:
     type: comma_delimited_list
@@ -94,7 +94,7 @@ parameters:
       is deployed on a different host. If you use a small/all-in-one openstack
       environment, you may need to disable this e.g. by passing
       '-P infra_server_group_policies=affinity'.
-    default: ['affinity']
+    default: ['anti-affinity']
 
   node_server_group_policies:
     type: comma_delimited_list
@@ -104,7 +104,7 @@ parameters:
       is deployed on a different host. If you use a small/all-in-one openstack
       environment, you may need to disable this e.g. by passing
       '-P node_server_group_policies=affinity'.
-    default: ['affinity']
+    default: ['anti-affinity']
 
   image:
     description: >
@@ -165,7 +165,7 @@ resources:
       external_network: {get_param: external_network}
       service_network: {get_param: service_network}
       service_subnet: {get_param: service_subnet}
-      security_group: {get_resource: openshift_security_group}
+      security_group: {get_resource: bastion_security_group}
       hostname: {get_param: bastion_hostname}
       domain_name: {get_param: domain_name}
       ssh_user: {get_param: ssh_user}
@@ -177,11 +177,11 @@ resources:
       master_count: {get_param: master_count}
       image: {get_param: image}
       master_flavor: {get_param: master_flavor}
-      #master_server_group_policies: {get_param: master_server_group_policies}
+      master_server_group_policies: {get_param: master_server_group_policies}
       external_network: {get_param: external_network}
       service_network: {get_param: service_network}
       service_subnet: {get_param: service_subnet}
-      security_group: {get_resource: openshift_security_group}
+      security_group: {get_resource: master_security_group}
       hostname_prefix: {get_param: master_hostname_prefix}
       domain_name: {get_param: domain_name}
       ssh_user: {get_param: ssh_user}
@@ -193,11 +193,11 @@ resources:
       infra_count: {get_param: infra_count}
       image: {get_param: image}
       infra_flavor: {get_param: infra_flavor}
-      #infra_server_group_policies: {get_param: infra_server_group_policies}
+      infra_server_group_policies: {get_param: infra_server_group_policies}
       external_network: {get_param: external_network}
       service_network: {get_param: service_network}
       service_subnet: {get_param: service_subnet}
-      security_group: {get_resource: openshift_security_group}
+      security_group: {get_resource: infra_security_group}
       hostname_prefix: {get_param: infra_hostname_prefix}
       domain_name: {get_param: domain_name}
       ssh_user: {get_param: ssh_user}
@@ -209,20 +209,109 @@ resources:
       node_count: {get_param: node_count}
       image: {get_param: image}
       node_flavor: {get_param: node_flavor}
-      #node_server_group_policies: {get_param: node_server_group_policies}
+      node_server_group_policies: {get_param: node_server_group_policies}
       external_network: {get_param: external_network}
       service_network: {get_param: service_network}
       service_subnet: {get_param: service_subnet}
-      security_group: {get_resource: openshift_security_group}
+      security_group: {get_resource: node_security_group}
       hostname_prefix: {get_param: node_hostname_prefix}
       domain_name: {get_param: domain_name}
       ssh_user: {get_param: ssh_user}
       ssh_key_name: {get_param: ssh_key_name}
 
-  openshift_security_group:
-    description: >
-      Define network access to DNS master servers
-      ICMP, SSH, and DNS (TCP and UDP) allowed
+  bastion_security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+      - protocol: icmp
+      - protocol: tcp
+        port_range_min: 22
+        port_range_max: 22
+      - protocol: tcp
+        port_range_min: 53
+        port_range_max: 53
+      - protocol: udp
+        port_range_min: 53
+        port_range_max: 53
+
+  node_security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+      - protocol: icmp
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 22
+        port_range_max: 22
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 10250
+        port_range_max: 10250
+      - direction: ingress
+        protocol: udp
+        port_range_min: 4789
+        port_range_max: 4789
+
+  master_security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+      - protocol: icmp
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 22
+        port_range_max: 22
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 4001
+        port_range_max: 4001
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 8443
+        port_range_max: 8443
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 53
+        port_range_max: 53
+      - direction: ingress
+        protocol: udp
+        port_range_min: 53
+        port_range_max: 53
+      - direction: ingress
+        protocol: udp
+        port_range_min: 4789
+        port_range_max: 4789
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 8053
+        port_range_max: 8053
+      - direction: ingress
+        protocol: udp
+        port_range_min: 8053
+        port_range_max: 8053
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 10250
+        port_range_max: 10250
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 24224
+        port_range_max: 24224
+      - direction: ingress
+        protocol: udp
+        port_range_min: 24224
+        port_range_max: 24224
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 2379
+        port_range_max: 2379
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 2380
+        port_range_max: 2380
+        remote_mode: remote_group_id
+
+  infra_security_group:
     type: OS::Neutron::SecurityGroup
     properties:
       rules:
@@ -241,88 +330,18 @@ resources:
         port_range_max: 443
       - direction: ingress
         protocol: tcp
-        port_range_min: 8443
-        port_range_max: 8444
-      - direction: ingress
-        protocol: tcp
-        port_range_min: 111
-        port_range_max: 111
-      - direction: ingress
-        protocol: udp
-        port_range_min: 111
-        port_range_max: 111
-      - direction: ingress
-        protocol: tcp
-        port_range_min: 892
-        port_range_max: 892
-      - direction: ingress
-        protocol: udp
-        port_range_min: 892
-        port_range_max: 892
-      - direction: ingress
-        protocol: tcp
-        port_range_min: 875
-        port_range_max: 875
-      - direction: ingress
-        protocol: udp
-        port_range_min: 875
-        port_range_max: 875
-      - direction: ingress
-        protocol: tcp
-        port_range_min: 662
-        port_range_max: 662
-      - direction: ingress
-        protocol: udp
-        port_range_min: 662
-        port_range_max: 662
-      - direction: ingress
-        protocol: tcp
-        port_range_min: 2049
-        port_range_max: 2049
-      - direction: ingress
-        protocol: tcp
-        port_range_min: 32803
-        port_range_max: 32803
-      - direction: ingress
-        protocol: udp
-        port_range_min: 32769
-        port_range_max: 32769
-      - direction: ingress
-        protocol: tcp
-        port_range_min: 53
-        port_range_max: 53
-      - direction: ingress
-        protocol: udp
-        port_range_min: 53
-        port_range_max: 53
-      - direction: ingress
-        protocol: tcp
-        port_range_min: 1936
-        port_range_max: 1936
-      - direction: ingress
-        protocol: tcp
-        port_range_min: 7001
-        port_range_max: 7001
-      - direction: ingress
-        protocol: tcp
-        port_range_min: 4001
-        port_range_max: 4001
-      - direction: ingress
-        protocol: tcp
         port_range_min: 10250
         port_range_max: 10250
-      - direction: ingress
-        protocol: tcp
-        port_range_min: 24224
-        port_range_max: 24224
       - direction: ingress
         protocol: udp
         port_range_min: 4789
         port_range_max: 4789
       - direction: ingress
-        protocol: udp
-        port_range_min: 28224
-        port_range_max: 28224
+        protocol: tcp
+        port_range_min: 5000
+        port_range_max: 5000
+      - protocol: 112
+
 
 outputs:
   bastion_ip_address:

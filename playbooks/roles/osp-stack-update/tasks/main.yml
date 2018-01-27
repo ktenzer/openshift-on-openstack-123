@@ -2,11 +2,10 @@
 
 - name: Check if {{ stack_name }} stack exists
   command: "openstack stack show {{ stack_name }}"
-  ignore_errors: yes
   register: stack_check
 
-- name: Create heat stack {{ stack_name }}
-  stack_create:
+- name: Update heat stack {{ stack_name }}
+  stack_update:
     name: "{{ stack_name }}"
     template: "{{ heat_template_path }}"
     parameters:
@@ -29,7 +28,7 @@
       infra_server_group_policies: "{{ infra_server_group_policies }}"
       node_server_group_policies: "{{ node_server_group_policies }}"
   register: stack_output
-  when: stack_check.rc != 0
+  when: stack_check.rc == 0
 
 - name: Register stack output
   command: >
@@ -39,6 +38,15 @@
 
 - set_fact:
     stack_output: "{{ stack_output_raw.stdout|from_json }}"
+
+#- name: Add the bastion to the inventory
+#  add_host:
+#    name: "{{ stack_output.bastion.address }}"
+#    groups: bastion
+#    zone: "{{ domain_name }}"
+#    domain_name: "{{ domain_name }}"
+#    contact: "{{ contact }}"
+#    ansible_user: "{{ ssh_user }}"
 
 - name: Wait 300 seconds for port 22 to become open and contain "OpenSSH"
   wait_for:
