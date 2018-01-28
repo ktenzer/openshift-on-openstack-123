@@ -16,6 +16,11 @@ We are happy to track and discuss ideas, topics and requests via 'Issues'.
 
 For more information on how to properly setup OpenStack see below:
 
+# Deployment Options
+```Single Master```
+Single Master deployment is 1 Master, 1 Infra node and X number of App nodes. This configuration is a non-HA setup, ideal for test environments.
+![](images/openshift_single_master.png)
+
 # Install
 ![](images/one.png)
 
