@@ -63,14 +63,14 @@
     name: "{{item}}"
     state: installed
     disablerepo: rhel-7-fast-datapath-rpms
-    disablerepo: rhel-7-server-ose-3.7-rpms
+    disablerepo: rhel-7-server-ose-{{ openshift_version }}-rpms
   with_items: "{{packages_bastion_openstack}}"
 
 - name: Install required openshift packages for bastion
   yum:
     name: "{{item}}"
     state: installed
-    disablerepo: rhel-7-server-openstack-12-tools-rpms
+    disablerepo: rhel-7-server-openstack-{{ openstack_version }}-tools-rpms
   with_items: "{{packages_bastion_openshift}}"
 
 - name: Copy OpenStack Credentials to Bastion
