@@ -18,6 +18,7 @@ For more information on how to properly setup OpenStack see below:
 
 # Install
 ![](images/one.png)
+
 ```[OpenStack Controller]```
 
 Authenticate OpenStack Credentials
