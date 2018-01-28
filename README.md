@@ -7,10 +7,11 @@ We are happy to track and discuss ideas, topics and requests via 'Issues'.
 
 # Pre-requisites
 * Working OpenStack deployment. Tested is OpenStack Pike (12) using RDO.
-* RHEL or CentOS 7 image. Tested is RHEL 7.4.
+* RHEL 7 image. Tested is RHEL 7.4.
 * An openstack ssh key for accessing instances.
 * Properly configured security group that allows ICMP and ssh at minimum.
 * A pre-configured provider network with at least three available floating ips.
+* Flavors configured for master, infra and app nodes.
 * A router that has the provider network configured as a gateway.
 * Properly configured cinder and nova storage.
 
@@ -26,6 +27,58 @@ Single Master deployment is 1 Master, 1 Infra node and X number of App nodes. Th
 ![](images/one.png)
 
 ```[OpenStack Controller]```
+
+Clone Git Repository
+```
+git clone https://github.com/ktenzer/openshift-on-openstack-123.git
+```
+
+Change dir to repository
+```
+cd openshift-on-openstack-123
+```
+
+Configure Parameters
+```
+# vi playbooks/vars.yml
+---
+### OpenStack General Setting ###
+domain_name: ocp3.lab
+dns_forwarders: [213.133.98.98, 213.133.98.99]
+external_network: public
+service_subnet_cidr: 192.168.1.0/24
+router_id: <router id from 'openstack router show'>
+image: rhel74
+ssh_user: cloud-user
+ssh_key_name: admin
+stack_name: openshift
+heat_template_path: /root/openshift-on-openstack-123/heat
+openshift_version: 3.7
+openstack_version: 12
+docker_version: 1.12.6
+contact: admin@ocp3.lab
+
+### Red Hat Subscription ###
+rhn_username: <user>
+rhn_password: <password>
+rhn_pool: <pool>
+
+### OpenStack Instance Count ###
+master_count: 1
+infra_count: 1
+node_count: 2
+
+### OpenStack Instance Group Policies ###
+master_server_group_policies: "['affinity']"
+infra_server_group_policies: "['affinity']"
+node_server_group_policies: "['affinity']"
+
+### OpenStack Instance Flavors ###
+bastion_flavor: ocp.bastion
+master_flavor: ocp.master
+infra_flavor: ocp.infra
+node_flavor: ocp.node
+```
 
 Authenticate OpenStack Credentials
 ```
