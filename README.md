@@ -19,6 +19,7 @@ For more information on how to properly setup OpenStack see below:
 # Install
 ![](images/one.png)
 ```[OpenStack Controller]```
+
 Authenticate OpenStack Credentials
 ```
 # source /root/keystonerc_admin
@@ -35,6 +36,7 @@ Deploy OpenStack Infrastructure for OpenShift
 ```
 
 ![](images/two.png)
+
 Get ip address of the bastion host.
 ```
 # openstack stack output show -f value -c output_value openshift ip_address
@@ -75,6 +77,7 @@ ssh -i /root/admin.pem cloud-user@144.76.134.226
 ```
 
 ```[Bastion Host]```
+
 Authenticate OpenStack Credentials
 ```
 [cloud-user@bastion ~]$ source /home/cloud-user/keystonerc_admin
@@ -101,6 +104,7 @@ node1 : ok=18 changed=13 unreachable=0 failed=0
 ![](images/three.png)
 
 ```[Bastion Host]```
+
 Deploy OpenShift.
 ```
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
