@@ -30,12 +30,12 @@ Single Master deployment is 1 Master, 1 Infra node and X number of App nodes. Th
 
 Clone Git Repository
 ```
-git clone https://github.com/ktenzer/openshift-on-openstack-123.git
+# git clone https://github.com/ktenzer/openshift-on-openstack-123.git
 ```
 
 Change dir to repository
 ```
-cd openshift-on-openstack-123
+# cd openshift-on-openstack-123
 ```
 
 Configure Parameters
