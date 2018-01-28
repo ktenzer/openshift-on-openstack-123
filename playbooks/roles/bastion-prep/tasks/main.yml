@@ -87,14 +87,6 @@
     mode: 0400
     owner: "{{ ssh_user }}"
 
-#- name: Setup OpenShift inventory file
-#  template:
-#    src: templates/openshift-inventory.j2
-#    dest: /home/{{ ssh_user }}/openshift-inventory
-#    owner: root
-#    group: root
-#    mode: 0755
-
 - name: Copy playbooks to bastion
   copy:
     src: ../playbooks

@@ -40,6 +40,14 @@
 - set_fact:
     stack_output: "{{ stack_output_raw.stdout|from_json }}"
 
+#- name: Update openshift subnet in inventory file
+#  lineinfile:
+#    path: /etc/selinux/config
+#    regexp: '^openshift_cloudprovider_openstack_lb_subnet_id='
+#    line: 'openshift_cloudprovider_openstack_lb_subnet_id={{ osp_subnet_id }}'
+#  vars:
+#    ansible_connection: local
+
 - name: Wait 300 seconds for port 22 to become open and contain "OpenSSH"
   wait_for:
     port: 22
