@@ -251,6 +251,59 @@ resources:
         protocol: udp
         port_range_min: 4789
         port_range_max: 4789
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 53
+        port_range_max: 53
+      - direction: ingress
+        protocol: udp
+        port_range_min: 53
+        port_range_max: 53
+      # NFS Ports
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 111
+        port_range_max: 111
+      - direction: ingress
+        protocol: udp
+        port_range_min: 111
+        port_range_max: 111
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 892
+        port_range_max: 892
+      - direction: ingress
+        protocol: udp
+        port_range_min: 892
+        port_range_max: 892
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 875
+        port_range_max: 875
+      - direction: ingress
+        protocol: udp
+        port_range_min: 875
+        port_range_max: 875
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 662
+        port_range_max: 662
+      - direction: ingress
+        protocol: udp
+        port_range_min: 662
+        port_range_max: 662
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 2049
+        port_range_max: 2049
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 32803
+        port_range_max: 32803
+      - direction: ingress
+        protocol: udp
+        port_range_min: 32769
+        port_range_max: 32769
 
   master_security_group:
     type: OS::Neutron::SecurityGroup

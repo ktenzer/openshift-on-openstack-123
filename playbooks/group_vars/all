@@ -18,7 +18,7 @@ packages_bastion_openstack:
 repos:
   - rhel-7-server-rpms
   - rhel-7-server-extras-rpms
-  - rhel-7-server-ose-3.7-rpms
+  - rhel-7-server-ose-{{ openshift_version }}-rpms
   - rhel-7-fast-datapath-rpms
 repos_bastion:
   - rhel-7-server-openstack-12-tools-rpms

@@ -17,7 +17,7 @@ containerized=false
 os_firewall_use_firewalld=True
 
 # Set Domain for Apps
-openshift_master_default_subdomain=apps.{{ hostvars['master0']['floatingip'] }}.xip.io
+openshift_master_default_subdomain=apps.{{ hostvars['infra0']['floatingip'] }}.xip.io
 
 # default project node selector
 osm_default_node_selector='region=primary'
@@ -27,6 +27,17 @@ osm_default_node_selector='region=primary'
 openshift_master_cluster_hostname=master0
 openshift_master_cluster_public_hostname=master0.{{ hostvars['master0']['floatingip'] }}.xip.io
 openshift_override_hostname_check=true
+
+# Openstack
+openshift_no_proxy=.ocp3.lab,169.254.169.254,144.76.56.119
+openshift_cloudprovider_kind=openstack
+openshift_cloudprovider_openstack_auth_url=http://144.76.56.119:5000/v3
+openshift_cloudprovider_openstack_username=admin
+openshift_cloudprovider_openstack_password=r3dH@t0!
+openshift_cloudprovider_openstack_domain_name=Default
+openshift_cloudprovider_openstack_tenant_name=admin
+openshift_cloudprovider_openstack_region=RegionOne
+openshift_cloudprovider_openstack_lb_subnet_id=dc26729a-f1ac-42f9-9f27-23f4bb25bb0f
 
 # Enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
@@ -38,7 +49,7 @@ os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
 # network blocks should be private and should not conflict with network blocks
 # in your infrastructure that pods may require access to. Can not be changed
 # after deployment.
-osm_cluster_network_cidr=10.1.0.0/16
+osm_cluster_network_cidr=10.30.0.0/16
 openshift_portal_net=172.30.0.0/16
 osm_host_subnet_length=8
 

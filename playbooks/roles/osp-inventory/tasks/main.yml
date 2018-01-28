@@ -42,6 +42,7 @@
     contact: "{{ contact }}"
     ansible_user: "{{ ssh_user }}"
     ansible_ssh_host: "{{ item.address }}"
+    floatingip: "{{ item.address }}"
   with_items: "{{ stack_output.infras }}"
 
 - name: Add the nodes to the inventory
