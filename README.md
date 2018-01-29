@@ -92,7 +92,7 @@ Disable host key checking
 
 Deploy OpenStack Infrastructure for OpenShift
 ```
-# ansible-playbook deploy-openstack-infra.yml --private-key=/root/admin.pem -e @vars.yml
+# ansible-playbook playbooks/deploy-openstack-infra.yml --private-key=/root/admin.pem -e @vars.yml
 ```
 
 ![](images/two.png)
