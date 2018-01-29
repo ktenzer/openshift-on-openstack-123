@@ -324,6 +324,10 @@ resources:
         port_range_max: 8443
       - direction: ingress
         protocol: tcp
+        port_range_min: 443
+        port_range_max: 443
+      - direction: ingress
+        protocol: tcp
         port_range_min: 53
         port_range_max: 53
       - direction: ingress
@@ -363,6 +367,10 @@ resources:
         port_range_min: 2380
         port_range_max: 2380
         remote_mode: remote_group_id
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 2049
+        port_range_max: 2049
 
   infra_security_group:
     type: OS::Neutron::SecurityGroup
