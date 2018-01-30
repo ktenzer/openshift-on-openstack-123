@@ -29,7 +29,6 @@ openshift_master_cluster_public_hostname=master0.{{ hostvars['master0']['floatin
 openshift_override_hostname_check=true
 
 # Openstack
-openshift_no_proxy=.ocp3.lab,169.254.169.254,144.76.56.119
 openshift_cloudprovider_kind=openstack
 openshift_cloudprovider_openstack_auth_url={{ lookup('env','OS_AUTH_URL') }}
 openshift_cloudprovider_openstack_username={{ lookup('env','OS_USERNAME') }}
@@ -37,8 +36,7 @@ openshift_cloudprovider_openstack_password={{ lookup('env','OS_PASSWORD') }}
 openshift_cloudprovider_openstack_domain_name={{ lookup('env','OS_PROJECT_DOMAIN_NAME') }}
 openshift_cloudprovider_openstack_tenant_name={{ lookup('env','OS_PROJECT_NAME') }}
 openshift_cloudprovider_openstack_region=RegionOne
-openshift_cloudprovider_openstack_lb_subnet_id=
-#openshift_cloudprovider_openstack_blockstorage_version=v2
+openshift_cloudprovider_openstack_blockstorage_version=v2
 
 # Enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]

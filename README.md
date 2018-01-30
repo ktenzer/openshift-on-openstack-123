@@ -168,6 +168,23 @@ node1 : ok=18 changed=13 unreachable=0 failed=0
 Deploy OpenShift.
 ```
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
+PLAY RECAP *****************************************************************************************
+infra0.ocp3.lab            : ok=183  changed=59   unreachable=0    failed=0
+localhost                  : ok=12   changed=0    unreachable=0    failed=0
+master0.ocp3.lab           : ok=635  changed=265  unreachable=0    failed=0
+node0.ocp3.lab             : ok=183  changed=59   unreachable=0    failed=0
+node1.ocp3.lab             : ok=183  changed=59   unreachable=0    failed=0
+
+
+INSTALLER STATUS ***********************************************************************************
+Initialization             : Complete
+Health Check               : Complete
+etcd Install               : Complete
+Master Install             : Complete
+Master Additional Install  : Complete
+Node Install               : Complete
+Hosted Install             : Complete
+Service Catalog Install    : Complete
 ```
 
 Login to OpenShift Master
@@ -200,3 +217,16 @@ Login in to UI.
 https://master0.144.76.134.230.xip.io:8443
 ```
 
+# Issues
+## Issue 1: Dynamic storage provisioning using cinder not working
+Currently using the OpenStack cloud provider requires using Cinder v2 API. Most current OpenStack deployments will default to v3.
+```
+Error creating cinder volume: BS API version autodetection failed.
+```
+If you provision OpenShift volume and it is pending check /var/log/messages on master. If you see this error you need to add following in /etc/origin/cloudprovider/openstack.conf on masters and all nodes then restart node and controller service on master.
+```
+...
+[BlockStorage]
+bs-version=v2
+...
+```
