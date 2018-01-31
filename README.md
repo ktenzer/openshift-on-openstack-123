@@ -230,3 +230,8 @@ If you provision OpenShift volume and it is pending check /var/log/messages on m
 bs-version=v2
 ...
 ```
+
+To do this automatically after installation run following playbook. An installer configuration option exists (openshift_cloudprovider_openstack_blockstorage_version=v2) but it seems to not set anything in OpenShift 3.7.
+```
+[cloud-user@bastion ~]$ ansible-playbook playbooks/cinder-v2-fix.yml  --private-key=/home/cloud-user/admin.pem -e @vars.yml
+```

@@ -85,10 +85,9 @@ resources:
     properties:
       name:
         str_replace:
-          template: "HOST.DOMAIN"
+          template: "HOSTNAME"
           params:
-            HOST: {get_param: hostname}
-            DOMAIN: {get_param: domain_name}
+            HOSTNAME: {get_param: hostname}
       admin_user: {get_param: ssh_user}
       image: {get_param: image}
       flavor: {get_param: bastion_flavor}

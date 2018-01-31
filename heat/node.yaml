@@ -82,10 +82,9 @@ resources:
     properties:
       name:
         str_replace:
-          template: "HOSTNAME.DOMAIN"
+          template: "HOSTNAME"
           params:
             HOSTNAME: {get_param: hostname}
-            DOMAIN: {get_param: domain_name}
       user_data_format: SOFTWARE_CONFIG
       user_data: {get_resource: init}
       image: {get_param: image}

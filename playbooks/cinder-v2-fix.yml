@@ -1,0 +1,51 @@
+---
+- name: Inventory OpenShift Nodes
+  hosts: localhost
+  connection: local
+  become: no
+  gather_facts: no
+  vars_files:
+    - vars.yml
+
+  tasks:
+  - import_role:
+      name: osp-inventory
+
+- name: Setup All OpenShift Nodes
+  hosts: openshift
+  gather_facts: true
+  become: true
+  tasks:
+  - name: Specify cinder v2 API for cloudprovider
+    blockinfile:
+      path: /etc/origin/cloudprovider/openstack.conf
+      insertafter: EOF
+      block: |
+        [BlockStorage]
+        bs-version=v2
+
+- name: Restart Master Services
+  hosts: masters
+  gather_facts: true
+  become: true
+
+  tasks:
+    - name: Restart master services
+      systemd:
+        name: "{{ item }}"
+        state: restarted
+      with_items:
+        - atomic-openshift-master-controllers
+        - atomic-openshift-master-api
+        - atomic-openshift-node
+
+- name: Restart Node Services
+  hosts: nodes
+  gather_facts: true
+  become: true
+
+  tasks:
+    - name: Restart Node Services
+      systemd:
+        name: atomic-openshift-node
+        state: restarted
