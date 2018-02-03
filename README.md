@@ -52,7 +52,7 @@ Configure Parameters
 ```
 # vi vars.yml
 ---
-### OpenStack General Setting ###
+### OpenStack Setting ###
 domain_name: ocp3.lab
 dns_forwarders: [213.133.98.98, 213.133.98.99]
 external_network: public
@@ -62,12 +62,17 @@ image: rhel74
 ssh_user: cloud-user
 ssh_key_name: admin
 stack_name: openshift
-openshift_version: 3.7
 openstack_version: 12
-docker_version: 1.12.6
 contact: admin@ocp3.lab
 heat_template_path: /root/openshift-on-openstack-123/heat/openshift.yaml
-openshift_ha: false
+
+### OpenShift Settings ###
+openshift_version: 3.7
+docker_version: 1.12.6
+openshift_ha: true
+registry_replicas: 2
+openshift_user: admin
+openshift_passwd: <password>
 
 ### Red Hat Subscription ###
 rhn_username: <user>
@@ -75,14 +80,15 @@ rhn_password: <password>
 rhn_pool: <pool>
 
 ### OpenStack Instance Count ###
-master_count: 1
-infra_count: 1
+master_count: 3
+infra_count: 2
 node_count: 2
 
 ### OpenStack Instance Group Policies ###
-master_server_group_policies: "['affinity']"
-infra_server_group_policies: "['affinity']"
-node_server_group_policies: "['affinity']"
+### Set to 'affinity' if only one compute node ###
+master_server_group_policies: "['anti-affinity']"
+infra_server_group_policies: "['anti-affinity']"
+node_server_group_policies: "['anti-affinity']"
 
 ### OpenStack Instance Flavors ###
 bastion_flavor: ocp.bastion
