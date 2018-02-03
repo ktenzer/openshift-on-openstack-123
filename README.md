@@ -291,7 +291,7 @@ Currently using the OpenStack cloud provider requires using Cinder v2 API. Most 
 ```
 Error creating cinder volume: BS API version autodetection failed.
 ```
-If you provision OpenShift volume and it is pending check /var/log/messages on master. If you see this error you need to add following in /etc/origin/cloudprovider/openstack.conf on masters and all nodes then restart node and controller service on master.
+If you provision OpenShift volume and it is pending check /var/log/messages on master. If you see this error you need to add following in /etc/origin/cloudprovider/openstack.conf on masters and all nodes then restart node service on node and controller service on master.
 ```
 ...
 [BlockStorage]
@@ -299,7 +299,4 @@ bs-version=v2
 ...
 ```
 
-To do this automatically after installation run following playbook. An installer configuration option exists (openshift_cloudprovider_openstack_blockstorage_version=v2) but it seems to not set anything in OpenShift 3.7.
-```
-[cloud-user@bastion ~]$ ansible-playbook cinder-v2-fix.yml  --private-key=/home/cloud-user/admin.pem -e @vars.yml
-```
+The post-openshift.yml playbook takes care of setting v2 for cinder automatically.
