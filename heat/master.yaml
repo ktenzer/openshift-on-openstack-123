@@ -6,8 +6,15 @@ description:
   The instances are created with Heat and then configured with Ansible
 
 parameters:
+  masters_pool:
+    type: string
+    description: The masters lbaas pool
 
-  # Connectivity
+  masters_app_port:
+    type: number
+    default: 8443
+    description: Port used by the servers
+
   external_network:
     type: string
     description: >
@@ -106,11 +113,19 @@ resources:
       - subnet: {get_param: service_subnet}
       replacement_policy: AUTO
 
-  floating_ip:
-    type: OS::Neutron::FloatingIP
+  pool_member:
+    type: OS::Neutron::LBaaS::PoolMember
     properties:
-      floating_network: {get_param: external_network}
-      port_id: {get_resource: port}
+      pool: { get_param: masters_pool }
+      address: { get_attr: [ host, first_address ]}
+      protocol_port: { get_param: masters_app_port }
+      subnet: { get_param: service_subnet }
+
+#  floating_ip:
+#    type: OS::Neutron::FloatingIP
+#    properties:
+#      floating_network: {get_param: external_network}
+#      port_id: {get_resource: port}
 
   cinder_volume:
     type: OS::Cinder::Volume
@@ -147,4 +162,4 @@ outputs:
   entry:
     value:
       name: {get_param: hostname}
-      address: {get_attr: [floating_ip, floating_ip_address]}
+      address: {get_attr: [port, fixed_ips, 0, ip_address]}

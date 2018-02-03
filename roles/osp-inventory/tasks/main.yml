@@ -30,7 +30,7 @@
     contact: "{{ contact }}"
     ansible_user: "{{ ssh_user }}"
     ansible_ssh_host: "{{ item.address }}"
-    floatingip: "{{ item.address }}"
+    lb_master: "{{ stack_output.lb_master.address }}"
   with_items: "{{ stack_output.masters }}"
 
 - name: Add the infras to the inventory
@@ -42,7 +42,7 @@
     contact: "{{ contact }}"
     ansible_user: "{{ ssh_user }}"
     ansible_ssh_host: "{{ item.address }}"
-    floatingip: "{{ item.address }}"
+    lb_infra: "{{ stack_output.lb_infra.address }}"
   with_items: "{{ stack_output.infras }}"
 
 - name: Add the nodes to the inventory

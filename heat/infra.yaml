@@ -6,8 +6,24 @@ description:
   The instances are created with Heat and then configured with Ansible
 
 parameters:
+  infras_pool_http:
+    type: string
+    description: The infras lbaas pool
 
-  # Connectivity
+  infras_pool_https:
+    type: string
+    description: The infras lbaas pool
+
+  infras_app_port_http:
+    type: number
+    default: 80
+    description: Port used by the servers
+
+  infras_app_port_https:
+    type: number
+    default: 443
+    description: Port used by the servers
+
   external_network:
     type: string
     description: >
@@ -106,11 +122,27 @@ resources:
       - subnet: {get_param: service_subnet}
       replacement_policy: AUTO
 
-  floating_ip:
-    type: OS::Neutron::FloatingIP
+  pool_member_http:
+    type: OS::Neutron::LBaaS::PoolMember
     properties:
-      floating_network: {get_param: external_network}
-      port_id: {get_resource: port}
+      pool: { get_param: infras_pool_http }
+      address: { get_attr: [ host, first_address ]}
+      protocol_port: { get_param: infras_app_port_http }
+      subnet: { get_param: service_subnet }
+
+  pool_member_https:
+    type: OS::Neutron::LBaaS::PoolMember
+    properties:
+      pool: { get_param: infras_pool_https }
+      address: { get_attr: [ host, first_address ]}
+      protocol_port: { get_param: infras_app_port_https }
+      subnet: { get_param: service_subnet }
+
+#  floating_ip:
+#    type: OS::Neutron::FloatingIP
+#    properties:
+#      floating_network: {get_param: external_network}
+#      port_id: {get_resource: port}
 
   cinder_volume:
     type: OS::Cinder::Volume
@@ -147,4 +179,4 @@ outputs:
   entry:
     value:
       name: {get_param: hostname}
-      address: {get_attr: [floating_ip, floating_ip_address]}
+      address: {get_attr: [port, fixed_ips, 0, ip_address]}

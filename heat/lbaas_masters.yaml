@@ -1,0 +1,77 @@
+---
+heat_template_version: 2016-10-14
+
+description:
+  A Load Balancer for OpenShift Masters
+
+parameters:
+  lb_port:
+    type: number
+    default: 8443
+    description: Port used by the load balancer
+
+  external_network:
+    type: string
+    description: Network used by the load balancer
+    constraints:
+    - custom_constraint: neutron.network
+
+  service_subnet:
+    description: >
+      The name or ID of the internal IPv4 space
+    type: string
+    constraints:
+    - custom_constraint: neutron.subnet
+
+resources:
+  monitor:
+    type: OS::Neutron::LBaaS::HealthMonitor
+    properties:
+      delay: 3
+      type: PING
+      timeout: 3
+      max_retries: 3
+      pool: { get_resource: pool }
+
+  pool:
+    type: OS::Neutron::LBaaS::Pool
+    properties:
+      lb_algorithm: LEAST_CONNECTIONS
+      protocol: HTTPS
+      listener: { get_resource: listener }
+
+  listener:
+    type: OS::Neutron::LBaaS::Listener
+    properties:
+      loadbalancer: { get_resource: loadbalancer }
+      protocol: HTTPS
+      protocol_port: { get_param: lb_port }
+
+  loadbalancer:
+    type: OS::Neutron::LBaaS::LoadBalancer
+    properties:
+      vip_subnet: { get_param: service_subnet }
+
+  floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: { get_param: external_network }
+      port_id: { get_attr: [loadbalancer, vip_port_id ]}
+
+outputs:
+  masters_pool:
+    description: The load balancer pool
+    value: {get_resource: pool}
+  lb_masters_floatingip:
+        value: {get_attr: [floating_ip, floating_ip_address]}
+  lburl:
+    value:
+      str_replace:
+        template: https://NAME.IP_ADDRESS.DOMAIN:PORT
+        params:
+          IP_ADDRESS: { get_attr: [ floating_ip, floating_ip_address ] }
+          PORT: { get_param: lb_port }
+          NAME: openshift
+          DOMAIN: xip.io
+    description: >
+      This URL is the "external" URL to access openshift

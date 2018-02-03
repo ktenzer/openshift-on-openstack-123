@@ -6,6 +6,15 @@ description:
   The instances are created with Heat and then configured with Ansible
 
 parameters:
+  masters_pool:
+    type: string
+    description: The masters lbaas pool
+
+  masters_app_port:
+    type: number
+    default: 8443
+    description: Port used by the servers
+
   master_count:
     type: number
     description: >
@@ -99,6 +108,8 @@ resources:
       resource_def:
         type: master.yaml
         properties:
+          masters_pool: {get_param: masters_pool}
+          masters_app_port: {get_param: masters_app_port}
           image: {get_param: image}
           flavor: {get_param: master_flavor}
           external_network: {get_param: external_network}

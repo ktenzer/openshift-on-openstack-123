@@ -1,5 +1,5 @@
 # General
-The purpose of this project is to provide a simple, yet flexible deployment of OpenShift on OpenStack using a three step process. 
+The purpose of this project is to provide a simple, yet flexible deployment of OpenShift on OpenStack using a three step process. This guide assumes you are familiar with OpenStack.
 
 # Contribution
 If you want to provide additional features, please feel free to contribute via pull requests or any other means.
@@ -9,19 +9,26 @@ We are happy to track and discuss ideas, topics and requests via 'Issues'.
 * Working OpenStack deployment. Tested is OpenStack Pike (12) using RDO.
 * RHEL 7 image. Tested is RHEL 7.4.
 * An openstack ssh key for accessing instances.
-* Properly configured security group that allows ICMP and ssh at minimum.
-* A pre-configured provider network with at least three available floating ips.
-* Flavors configured for master, infra and app nodes.
+* A pre-configured provider (public) network with at least three available floating ips.
+* Flavors configured for OpenShift.
+  * ocp.master  (2 vCPU, 4GB RAM, 30 GB Root Disk)
+  * ocp.infra   (4 vCPU, 16GB RAM, 30 GB Root Disk)
+  * ocp.node    (2 vCPU, 4GB RAM, 30 GB Root Disk)
+  * ocp.bastion (1 vCPU, 4GB RAM, 30 GB Root Disk)
 * A router that has the provider network configured as a gateway.
 * Properly configured cinder and nova storage.
+  * Make sure you aren't using default loop back and have disabled disk zeroing in cinder/nova for LVM.
 
-For more information on how to properly setup OpenStack see below:
-
-# Tested Deployment Options
-```Single Master```
+# Tested Deployments
+```Single Master - Non HA```
 
 Single Master deployment is 1 Master, 1 Infra node and X number of App nodes. This configuration is a non-HA setup, ideal for test environments.
-![](images/openshift_single_master.png)
+![](images/openshift_on_openstack_non_ha.PNG)
+
+```Multiple Master - HA```
+
+Multiple Master deployment is 3 Master, 2 Infra node and X number of App nodes. This configuration is an HA setup, ideal for non-test environments. A caution regarding production. By default etcd and registry are not using persistent storage. This would need to be configured post-install.
+![](images/openshift_on_openstack_ha.PNG)
 
 # Install
 ![](images/one.png)
@@ -40,23 +47,27 @@ Change dir to repository
 
 Configure Parameters
 ```
-# vi playbooks/vars.yml
+# cp sample-vars.yml vars.yml
+```
+```
+# vi vars.yml
 ---
 ### OpenStack General Setting ###
 domain_name: ocp3.lab
 dns_forwarders: [213.133.98.98, 213.133.98.99]
 external_network: public
 service_subnet_cidr: 192.168.1.0/24
-router_id: <router id from 'openstack router show'>
+router_id: <router id from 'openstack router list'>
 image: rhel74
 ssh_user: cloud-user
 ssh_key_name: admin
 stack_name: openshift
-heat_template_path: /root/openshift-on-openstack-123/heat
 openshift_version: 3.7
 openstack_version: 12
 docker_version: 1.12.6
 contact: admin@ocp3.lab
+heat_template_path: /root/openshift-on-openstack-123/heat/openshift.yaml
+openshift_ha: false
 
 ### Red Hat Subscription ###
 rhn_username: <user>
@@ -92,7 +103,7 @@ Disable host key checking
 
 Deploy OpenStack Infrastructure for OpenShift
 ```
-# ansible-playbook playbooks/deploy-openstack-infra.yml --private-key=/root/admin.pem -e @vars.yml
+# ansible-playbook deploy-openstack-infra.yml --private-key=/root/admin.pem -e @vars.yml
 ```
 
 ![](images/two.png)
@@ -105,27 +116,47 @@ Get ip address of the bastion host.
   "masters": [
     {
       "name": "master0",
-      "address": "144.76.134.230"
+      "address": "192.168.1.19"
+    },
+    {
+      "name": "master1",
+      "address": "192.168.1.16"
+    },
+    {
+      "name": "master2",
+      "address": "192.168.1.15"
     }
   ],
+  "lb_master": {
+    "name": "lb_master",
+    "address": "144.76.134.230"
+  },
+  "infras": [
+    {
+      "name": "infra0",
+      "address": "192.168.1.10"
+    },
+    {
+      "name": "infra1",
+      "address": "192.168.1.11"
+    }
+  ],
+  "lb_infra": {
+    "name": "lb_infra",
+    "address": "144.76.134.229"
+  },
   "bastion": {
     "name": "bastion",
-    "address": "144.76.134.226"
+    "address": "144.76.134.228"
   },
   "nodes": [
     {
       "name": "node0",
-      "address": "10.0.1.8"
+      "address": "192.168.1.6"
     },
     {
       "name": "node1",
-      "address": "10.0.1.13"
-    }
-  ],
-  "infras": [
-    {
-      "name": "infra0",
-      "address": "144.76.134.228"
+      "address": "192.168.1.13"
     }
   ]
 }
@@ -133,10 +164,14 @@ Get ip address of the bastion host.
 
 SSH to the bastion host using cloud-user and key.
 ```
-ssh -i /root/admin.pem cloud-user@144.76.134.226
+ssh -i /root/admin.pem cloud-user@144.76.134.229
 ```
 
 ```[Bastion Host]```
+Change dir to repository
+```
+# cd openshift-on-openstack-123
+```
 
 Authenticate OpenStack Credentials
 ```
@@ -150,15 +185,18 @@ Disable host key checking
 
 Prepare the nodes for deployment of OpenShift.
 ```
-[cloud-user@bastion ~]$ ansible-playbook playbooks/prepare-openshift.yml --private-key=/home/cloud-user/admin.pem -e @playbooks/vars.yml
+[cloud-user@bastion ~]$ ansible-playbook prepare-openshift.yml --private-key=/home/cloud-user/admin.pem -e @vars.yml
 
-PLAY RECAP **************************************************************************************************************************************
-bastion : ok=15 changed=7 unreachable=0 failed=0
-infra0 : ok=18 changed=13 unreachable=0 failed=0
-localhost : ok=7 changed=6 unreachable=0 failed=0
-master0 : ok=18 changed=13 unreachable=0 failed=0
-node0 : ok=18 changed=13 unreachable=0 failed=0
-node1 : ok=18 changed=13 unreachable=0 failed=0
+PLAY RECAP *****************************************************************************************
+bastion                    : ok=15   changed=7    unreachable=0    failed=0
+infra0                     : ok=18   changed=13   unreachable=0    failed=0
+infra1                     : ok=18   changed=13   unreachable=0    failed=0
+localhost                  : ok=7    changed=6    unreachable=0    failed=0
+master0                    : ok=18   changed=13   unreachable=0    failed=0
+master1                    : ok=18   changed=13   unreachable=0    failed=0
+master2                    : ok=18   changed=13   unreachable=0    failed=0
+node0                      : ok=18   changed=13   unreachable=0    failed=0
+node1                      : ok=18   changed=13   unreachable=0    failed=0
 ```
 
 ![](images/three.png)
@@ -187,7 +225,18 @@ Hosted Install             : Complete
 Service Catalog Install    : Complete
 ```
 
-Login to OpenShift Master
+Run post install playbook
+```
+[cloud-user@bastion ~]$ ansible-playbook post-openshift.yml --private-key=/home/cloud-user/admin.pem -e @vars.yml
+```
+
+Login in to UI.
+```
+https://openshift.144.76.134.226.xip.io:8443
+```
+
+# Optional
+Configure admin user
 ```
 [cloud-user@bastion ~]$ ssh -i /home/cloud-user/admin.pem cloud-user@master0
 ```
@@ -197,24 +246,37 @@ Authenticate as system:admin user.
 [cloud-user@master0 ~]$ oc login -u system:admin -n default
 ```
 
-Create a new user in OpenShift for API access.
-```
-[cloud-user@master0 ~]$ sudo htpasswd -c /etc/origin/master/htpasswd admin
-```
-
 Make user OpenShift Cluster Administrator
 ```
 [cloud-user@master0 ~]$ oadm policy add-cluster-role-to-user cluster-admin admin
 ```
 
-Authenticate as new user.
+Install Metrics
+Set metrics to true in inventory
 ```
-[cloud-user@master0 ~]$ oc login -u admin -n default
+[cloud-user@bastion ~]$ vi openshift_inventory
+...
+openshift_hosted_metrics_deploy=true
+...
 ```
 
-Login in to UI.
+Run playbook for metrics
 ```
-https://master0.144.76.134.230.xip.io:8443
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml
+```
+
+Install Logging
+Set logging to true in inventory
+```
+[cloud-user@bastion ~]$ vi openshift_inventory
+...
+openshift_hosted_logging_deploy=true
+...
+```
+
+Run playbook for logging
+```
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-logging.yml
 ```
 
 # Issues
@@ -233,5 +295,5 @@ bs-version=v2
 
 To do this automatically after installation run following playbook. An installer configuration option exists (openshift_cloudprovider_openstack_blockstorage_version=v2) but it seems to not set anything in OpenShift 3.7.
 ```
-[cloud-user@bastion ~]$ ansible-playbook playbooks/cinder-v2-fix.yml  --private-key=/home/cloud-user/admin.pem -e @vars.yml
+[cloud-user@bastion ~]$ ansible-playbook cinder-v2-fix.yml  --private-key=/home/cloud-user/admin.pem -e @vars.yml
 ```

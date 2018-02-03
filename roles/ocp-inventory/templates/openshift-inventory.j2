@@ -3,7 +3,6 @@
 masters
 etcd
 nodes
-nfs
 
 # Set variables common for all OSEv3 hosts
 [OSEv3:vars]
@@ -17,15 +16,15 @@ containerized=false
 os_firewall_use_firewalld=True
 
 # Set Domain for Apps
-openshift_master_default_subdomain=apps.{{ hostvars['infra0']['floatingip'] }}.xip.io
+openshift_master_default_subdomain=apps.{{ hostvars['infra0']['lb_infra'] }}.xip.io
 
 # default project node selector
 osm_default_node_selector='region=primary'
 
 # Native high availability cluster method with optional load balancer.
 #openshift_master_cluster_method=native
-openshift_master_cluster_hostname=master0
-openshift_master_cluster_public_hostname=master0.{{ hostvars['master0']['floatingip'] }}.xip.io
+openshift_master_cluster_hostname=openshift.{{ hostvars['master0']['lb_master'] }}.xip.io
+openshift_master_cluster_public_hostname=openshift.{{ hostvars['master0']['lb_master'] }}.xip.io
 openshift_override_hostname_check=true
 
 # Openstack
@@ -62,49 +61,30 @@ openshift_hosted_router_selector='region=infra'
 # Deploy Registry
 openshift_hosted_manage_registry=true
 openshift_registry_selector='region=infra'
-openshift_hosted_registry_replicas=1
-openshift_hosted_registry_storage_kind=nfs
-openshift_hosted_registry_storage_access_modes=['ReadWriteMany']
-openshift_hosted_registry_storage_nfs_directory=/exports
-openshift_hosted_registry_storage_nfs_options='*(rw,root_squash)'
-openshift_hosted_registry_storage_volume_name=registry
-openshift_hosted_registry_storage_volume_size=10Gi
+openshift_hosted_registry_replicas={{ registry_replicas }}
 
 # Deploy logging
-openshift_logging_install_logging=false
-openshift_logging_storage_kind=nfs
-openshift_logging_storage_access_modes=['ReadWriteOnce']
-openshift_logging_storage_nfs_directory=/exports
-openshift_logging_storage_nfs_options='*(rw,root_squash)'
-openshift_logging_storage_volume_name=logging
-openshift_logging_storage_volume_size=10Gi
+openshift_hosted_logging_deploy=false
+openshift_logging_es_pvc_dynamic=true
+openshift_logging_es_pvc_size=10Gi
+openshift_logging_es_cluster_size=3
+openshift_logging_es_nodeselector={"role":"infra"}
+openshift_logging_kibana_nodeselector={"role":"infra"}
+openshift_logging_curator_nodeselector={"role":"infra"}
 
 # Deploy Metrics
-openshift_metrics_install_metrics=true
-openshift_metrics_storage_kind=nfs
-openshift_metrics_storage_access_modes=['ReadWriteOnce']
-openshift_metrics_storage_nfs_directory=/exports
-openshift_metrics_storage_nfs_options='*(rw,root_squash)'
-openshift_metrics_storage_volume_name=metrics
-openshift_metrics_storage_volume_size=10Gi
+openshift_hosted_metrics_deploy=false
+openshift_hosted_metrics_storage_kind=dynamic
+openshift_hosted_metrics_storage_volume_size=10Gi
+openshift_metrics_hawkular_nodeselector={"role":"infra"}
+openshift_metrics_cassandra_nodeselector={"role":"infra"}
+openshift_metrics_heapster_nodeselector={"role":"infra"}
 
 # OpenShift Template Service Broker
 openshift_template_service_broker_namespaces=['openshift']
 
 # Deploy Service Catalog
 openshift_enable_service_catalog=true
-
-# ETCD Storage
-openshift_hosted_etcd_storage_kind=nfs
-openshift_hosted_etcd_storage_nfs_options="*(rw,root_squash,sync,no_wdelay)"
-openshift_hosted_etcd_storage_nfs_directory=/exports/etcd 
-openshift_hosted_etcd_storage_volume_name=etcd-vol2 
-openshift_hosted_etcd_storage_access_modes=["ReadWriteOnce"]
-openshift_hosted_etcd_storage_volume_size=1G
-openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
-
-# nfs server
-[nfs]
 
 # host group for masters
 [masters]

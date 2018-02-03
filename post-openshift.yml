@@ -11,9 +11,8 @@
   - import_role:
       name: osp-inventory
 
-- name: Setup All OpenShift Nodes
+- name: Configure Cinder v2 on all nodes
   hosts: openshift
-  gather_facts: true
   become: true
   tasks:
   - name: Specify cinder v2 API for cloudprovider
@@ -24,28 +23,37 @@
         [BlockStorage]
         bs-version=v2
 
-- name: Restart Master Services
+- name: Post Configuration of Masters
   hosts: masters
-  gather_facts: true
   become: true
 
   tasks:
+    - name: Install python-passlib
+      yum:
+        name: python-passlib
+        state: installed
+
+    - name: Create OpenShift user
+      htpasswd:
+        path: /etc/origin/master/htpasswd
+        name: "{{ openshift_user }}"
+        password: "{{ openshift_passwd }}"
+        owner: root
+        mode: 0640
+
     - name: Restart master services
-      systemd:
+      service:
         name: "{{ item }}"
         state: restarted
       with_items:
         - atomic-openshift-master-controllers
-        - atomic-openshift-master-api
-        - atomic-openshift-node
 
-- name: Restart Node Services
-  hosts: nodes
-  gather_facts: true
+- name: Restart OpenShift Nodes
+  hosts: nodes,infras
   become: true
 
   tasks:
     - name: Restart Node Services
-      systemd:
+      service:
         name: atomic-openshift-node
         state: restarted

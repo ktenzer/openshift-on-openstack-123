@@ -1,0 +1,37 @@
+- name: Setup OpenShift inventory file
+  template:
+    src: templates/openshift-inventory.j2
+    dest: /home/{{ ssh_user }}/openshift-inventory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Configure masters dynamically
+  lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
+    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} server_type=\"master\""
+    insertafter="^#?\[masters\]"
+  with_items: "{{ groups['masters'] }}"
+
+- name: Configure etcd nodes dynamically
+  lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
+    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} server_type=\"etcd\""
+    insertafter="^#?\[etcd\]"
+  with_items: "{{ groups['masters'] }}"
+
+- name: Configure master nodes dynamically
+  lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
+    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} openshift_schedulable=False"
+    insertafter="^#?\[nodes\]"
+  with_items: "{{ groups['masters'] }}"
+
+- name: Configure infra nodes dynamically
+  lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
+    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_labels=\"{'region'{{ ":" }} 'infra', 'zone'{{ ":" }} 'test', 'fluentd'{{ ":" }} 'true'}\""
+    insertafter="^#?{{ master_regex }}"
+  with_items: "{{ groups['infras'] }}"
+
+- name: Configure app nodes dynamically
+  lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
+    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_labels=\"{'region'{{ ":" }} 'primary', 'zone'{{ ":" }} 'test', 'fluentd'{{ ":" }} 'true'}\""
+    insertafter="^#?{{ infra_regex }}"
+  with_items: "{{ groups['nodes'] }}"

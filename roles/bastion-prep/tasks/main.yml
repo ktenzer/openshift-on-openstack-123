@@ -89,7 +89,7 @@
 
 - name: Copy playbooks to bastion
   copy:
-    src: ../playbooks
+    src: "{{ playbook_dir }}"
     dest: /home/{{ ssh_user }}
     directory_mode: 0755
     mode: 0755

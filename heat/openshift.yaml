@@ -7,7 +7,6 @@ description:
 
 parameters:
 
-  # Connectivity
   external_network:
     type: string
     description: >
@@ -168,6 +167,20 @@ resources:
       dns_nameservers: {get_param: dns_forwarders}
       router_id: {get_param: router_id}
 
+  lbaas_masters:
+    depends_on: [network]
+    type: lbaas_masters.yaml
+    properties:
+      external_network: {get_param: external_network}
+      service_subnet: {get_attr: [network, openshift_subnet]}
+    
+  lbaas_infras:
+    depends_on: [network]
+    type: lbaas_infras.yaml
+    properties:
+      external_network: {get_param: external_network}
+      service_subnet: {get_attr: [network, openshift_subnet]}
+
   hosts:
     depends_on: [network]
     type: hosts.yaml
@@ -175,6 +188,9 @@ resources:
       external_network: {get_param: external_network}
       service_network: {get_attr: [network, openshift_network]}
       service_subnet: {get_attr: [network, openshift_subnet]}
+      masters_pool: {get_attr: [lbaas_masters, masters_pool]}
+      infras_pool_http: {get_attr: [lbaas_infras, infras_pool_http]}
+      infras_pool_https: {get_attr: [lbaas_infras, infras_pool_https]}
       image: {get_param: image}
       bastion_flavor: {get_param: bastion_flavor}
       master_flavor: {get_param: master_flavor}
@@ -204,3 +220,11 @@ outputs:
       masters: {get_attr: [hosts, master_entries]}
       infras: {get_attr: [hosts, infra_entries]}
       nodes: {get_attr: [hosts, node_entries]}
+      lb_master: 
+        name: lb_master
+        address: {get_attr: [lbaas_masters, lb_masters_floatingip]}
+      lb_infra: 
+        name: lb_infra
+        address: {get_attr: [lbaas_infras, lb_infras_floatingip]}
+  openshift_master_url:
+    value: {get_attr: [lbaas_masters, lburl]}

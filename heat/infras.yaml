@@ -6,6 +6,14 @@ description:
   The instances are created with Heat and then configured with Ansible
 
 parameters:
+  infras_pool_http:
+    type: string
+    description: The infras lbaas pool
+
+  infras_pool_https:
+    type: string
+    description: The infras lbaas pool
+
   infra_count:
     type: number
     description: >
@@ -99,6 +107,8 @@ resources:
       resource_def:
         type: infra.yaml
         properties:
+          infras_pool_http: {get_param: infras_pool_http}
+          infras_pool_https: {get_param: infras_pool_https}
           image: {get_param: image}
           flavor: {get_param: infra_flavor}
           external_network: {get_param: external_network}

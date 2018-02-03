@@ -7,6 +7,18 @@ description:
   The instances are created with Heat and then configured with Ansible
 
 parameters:
+  masters_pool:
+    type: string
+    description: The masters lbaas pool
+
+  infras_pool_http:
+    type: string
+    description: The infras lbaas pool
+
+  infras_pool_https:
+    type: string
+    description: The infras lbaas pool
+
   node_count:
     type: number
     description: >
@@ -174,6 +186,7 @@ resources:
   masters:
     type: masters.yaml
     properties:
+      masters_pool: {get_param: masters_pool}
       master_count: {get_param: master_count}
       image: {get_param: image}
       master_flavor: {get_param: master_flavor}
@@ -190,6 +203,8 @@ resources:
   infras:
     type: infras.yaml
     properties:
+      infras_pool_http: {get_param: infras_pool_http}
+      infras_pool_https: {get_param: infras_pool_https}
       infra_count: {get_param: infra_count}
       image: {get_param: image}
       infra_flavor: {get_param: infra_flavor}
