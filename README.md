@@ -27,7 +27,7 @@ Single Master deployment is 1 Master, 1 Infra node and X number of App nodes. Th
 
 ```Multiple Master - HA```
 
-Multiple Master deployment is 3 Master, 2 Infra node and X number of App nodes. This configuration is an HA setup, ideal for non-test environments. A caution regarding production. By default etcd and registry are not using persistent storage. This would need to be configured post-install.
+Multiple Master deployment is 3 Master, 2 Infra node and X number of App nodes. This configuration is an HA setup. By default etcd and registry are not using persistent storage. This would need to be configured post-install manually at this time if those should be persisted.
 ![](images/openshift_on_openstack_ha.PNG)
 
 # Install
