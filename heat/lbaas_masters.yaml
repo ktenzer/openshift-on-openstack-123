@@ -28,7 +28,7 @@ resources:
     type: OS::Neutron::LBaaS::HealthMonitor
     properties:
       delay: 3
-      type: PING
+      type: HTTPS
       timeout: 3
       max_retries: 3
       pool: { get_resource: pool }
@@ -36,7 +36,7 @@ resources:
   pool:
     type: OS::Neutron::LBaaS::Pool
     properties:
-      lb_algorithm: LEAST_CONNECTIONS
+      lb_algorithm: ROUND_ROBIN
       protocol: HTTPS
       listener: { get_resource: listener }
 
