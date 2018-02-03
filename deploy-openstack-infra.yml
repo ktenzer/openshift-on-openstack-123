@@ -4,8 +4,6 @@
   connection: local
   become: no
   gather_facts: no
-  vars_files:
-    - vars.yml
 
   tasks:
   - import_role:
@@ -16,8 +14,6 @@
 - name: Configure OpenStack Client on Bastion
   hosts: bastion
   become: true
-  vars_files:
-    - vars.yml
 
   tasks:
   - import_role:

@@ -4,8 +4,6 @@
   connection: local
   become: no
   gather_facts: no
-  vars_files:
-    - vars.yml
 
   tasks:
   - import_role:

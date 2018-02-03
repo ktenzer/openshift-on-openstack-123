@@ -174,6 +174,7 @@ ssh -i /root/admin.pem cloud-user@144.76.134.229
 ```
 
 ```[Bastion Host]```
+
 Change dir to repository
 ```
 # cd openshift-on-openstack-123
@@ -234,6 +235,16 @@ Service Catalog Install    : Complete
 Run post install playbook
 ```
 [cloud-user@bastion ~]$ ansible-playbook post-openshift.yml --private-key=/home/cloud-user/admin.pem -e @vars.yml
+
+PLAY RECAP **************************************************************************************************************************
+infra0                     : ok=4    changed=2    unreachable=0    failed=0
+infra1                     : ok=4    changed=2    unreachable=0    failed=0
+localhost                  : ok=7    changed=6    unreachable=0    failed=0
+master0                    : ok=6    changed=4    unreachable=0    failed=0
+master1                    : ok=6    changed=4    unreachable=0    failed=0
+master2                    : ok=6    changed=4    unreachable=0    failed=0
+node0                      : ok=4    changed=2    unreachable=0    failed=0
+node1                      : ok=4    changed=2    unreachable=0    failed=0
 ```
 
 Login in to UI.
@@ -300,3 +311,7 @@ bs-version=v2
 ```
 
 The post-openshift.yml playbook takes care of setting v2 for cinder automatically.
+
+## Issue 2: Service Catalog failed due to API timeout
+
+This seems to be general issue with OpenShift 3.7 installer, somtimes API timeout's occur, it can be ignored.

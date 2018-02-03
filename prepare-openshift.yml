@@ -4,8 +4,6 @@
   connection: local
   become: no
   gather_facts: no
-  vars_files:
-    - vars.yml
 
   tasks:
   - import_role:
@@ -15,8 +13,7 @@
   hosts: all
   gather_facts: yes
   become: yes
-  vars_files:
-    - vars.yml
+
   tasks:
   - import_role:
       name: all-prep
@@ -25,8 +22,7 @@
   hosts: openshift
   gather_facts: true
   become: true
-  vars_files:
-    - vars.yml
+
   tasks:
   - import_role:
       name: docker-prep
@@ -35,8 +31,7 @@
   hosts: bastion
   gather_facts: true
   become: true
-  vars_files:
-    - vars.yml
+
   tasks:
   - import_role:
       name: ocp-inventory
