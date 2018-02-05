@@ -5,6 +5,10 @@ The purpose of this project is to provide a simple, yet flexible deployment of O
 If you want to provide additional features, please feel free to contribute via pull requests or any other means.
 We are happy to track and discuss ideas, topics and requests via 'Issues'.
 
+In addition I would like to metion I borrowed a lot of ideas from two other projects.
+* [OpenShift setup for Hetzner from RH SSA team](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp)
+* [OpenShift on OpenStack](https://github.com/redhat-openstack/openshift-on-openstack)
+
 # Pre-requisites
 * Working OpenStack deployment. Tested is OpenStack Pike (12) using RDO.
 * RHEL 7 image. Tested is RHEL 7.4.
