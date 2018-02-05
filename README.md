@@ -215,8 +215,11 @@ Deploy OpenShift.
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
 PLAY RECAP *****************************************************************************************
 infra0.ocp3.lab            : ok=183  changed=59   unreachable=0    failed=0
+infra1.ocp3.lab            : ok=183  changed=59   unreachable=0    failed=0
 localhost                  : ok=12   changed=0    unreachable=0    failed=0
 master0.ocp3.lab           : ok=635  changed=265  unreachable=0    failed=0
+master1.ocp3.lab           : ok=635  changed=265  unreachable=0    failed=0
+master2.ocp3.lab           : ok=635  changed=265  unreachable=0    failed=0
 node0.ocp3.lab             : ok=183  changed=59   unreachable=0    failed=0
 node1.ocp3.lab             : ok=183  changed=59   unreachable=0    failed=0
 
@@ -312,6 +315,10 @@ bs-version=v2
 
 The post-openshift.yml playbook takes care of setting v2 for cinder automatically.
 
-## Issue 2: Service Catalog failed due to API timeout
+## Issue 2: Service Catalog Install Fails
 
-This seems to be general issue with OpenShift 3.7 installer, somtimes API timeout's occur, it can be ignored.
+This seems to be general issue with OpenShift 3.7 installer, somtimes API timeout's occur, it can be ignored or you can re-run playbook to install just service catalog.
+
+## Issue 3: Hosted Install Fails
+
+The registry sometimes fails to complete install due to host resolution of xip.io. Not sure if this is issue in OpenShift 3.7 or environment. Simply re-running hosted playbook resolved the issue and resulted in successful installation.
