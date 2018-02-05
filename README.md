@@ -19,7 +19,7 @@ We are happy to track and discuss ideas, topics and requests via 'Issues'.
 * Properly configured cinder and nova storage.
   * Make sure you aren't using default loop back and have disabled disk zeroing in cinder/nova for LVM.
 
-More information on setting up proper OpenStack environment can be found here: ```https://keithtenzer.com/2018/02/05/openstack-12-pike-lab-installation-and-configuration-guide-with-hetzner-root-servers/```
+More information on setting up proper OpenStack environment can be found [here](https://keithtenzer.com/2018/02/05/openstack-12-pike-lab-installation-and-configuration-guide-with-hetzner-root-servers/).
 
 # Tested Deployments
 ```Single Master - Non HA```
