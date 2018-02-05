@@ -19,6 +19,8 @@ We are happy to track and discuss ideas, topics and requests via 'Issues'.
 * Properly configured cinder and nova storage.
   * Make sure you aren't using default loop back and have disabled disk zeroing in cinder/nova for LVM.
 
+More information on setting up proper OpenStack environment can be found here: ```https://keithtenzer.com/2018/02/05/openstack-12-pike-lab-installation-and-configuration-guide-with-hetzner-root-servers/```
+
 # Tested Deployments
 ```Single Master - Non HA```
 
@@ -38,6 +40,11 @@ Multiple Master deployment is 3 Master, 2 Infra node and X number of App nodes. 
 Clone Git Repository
 ```
 # git clone https://github.com/ktenzer/openshift-on-openstack-123.git
+```
+
+Checkout release branch 1.0
+```
+# git checkout release-1.0
 ```
 
 Change dir to repository
