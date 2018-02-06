@@ -22,4 +22,11 @@
     that:
       - (master_count == 3) and (infra_count > 1)
     msg: "OpenShift HA requires 3 masters and at least 2 infra nodes"
-    when: openshift_ha
+  when: openshift_ha
+
+- name: Validate Registry HA
+  assert:
+    that:
+      - (registry_replicas > 1 )
+    msg: "OpenShift HA requires at least 2 registry replicas"
+  when: openshift_ha
