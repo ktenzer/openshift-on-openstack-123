@@ -294,6 +294,20 @@ openshift_hosted_metrics_deploy=true
 Run playbook for metrics
 ```
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml
+PLAY RECAP **************************************************************************************************************************
+infra0.ocp3.lab            : ok=45   changed=4    unreachable=0    failed=0
+infra1.ocp3.lab            : ok=45   changed=4    unreachable=0    failed=0
+localhost                  : ok=11   changed=0    unreachable=0    failed=0
+master0.ocp3.lab           : ok=48   changed=4    unreachable=0    failed=0
+master1.ocp3.lab           : ok=48   changed=4    unreachable=0    failed=0
+master2.ocp3.lab           : ok=205  changed=48   unreachable=0    failed=0
+node0.ocp3.lab             : ok=45   changed=4    unreachable=0    failed=0
+node1.ocp3.lab             : ok=45   changed=4    unreachable=0    failed=0
+
+
+INSTALLER STATUS ********************************************************************************************************************
+Initialization             : Complete
+Metrics Install            : Complete
 ```
 
 Install Logging
