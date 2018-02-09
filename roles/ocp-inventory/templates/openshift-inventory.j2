@@ -64,21 +64,38 @@ openshift_registry_selector='region=infra'
 openshift_hosted_registry_replicas={{ registry_replicas }}
 
 # Deploy logging
-openshift_hosted_logging_deploy=false
+openshift_logging_install_logging=false
+openshift_logging_kibana_hostname=logging.apps.{{ hostvars['infra0']['lb_infra'] }}.xip.io
+openshift_logging_use_ops=false
+openshift_logging_master_url=master1
+openshift_logging_public_master_url=openshift.{{ hostvars['master0']['lb_master'] }}.xip.io
+openshift_logging_curator_default_days=7
+openshift_logging_es_memory_limit=1Gi
+openshift_logging_es_cpu_limit=250m
 openshift_logging_es_pvc_dynamic=true
 openshift_logging_es_pvc_size=10Gi
-openshift_logging_es_cluster_size=3
-openshift_logging_es_nodeselector={"role":"infra"}
-openshift_logging_kibana_nodeselector={"role":"infra"}
-openshift_logging_curator_nodeselector={"role":"infra"}
+openshift_logging_curator_nodeselector={"region":"infra"}
+openshift_logging_es_nodeselector={"region":"infra"}
+openshift_logging_fluentd_nodeselector={"fluentd":"true"}
+openshift_logging_kibana_nodeselector={"region":"infra"}
 
 # Deploy Metrics
-openshift_hosted_metrics_deploy=false
+openshift_metrics_install_metrics=false
+openshift_metrics_start_cluster=true
+openshift_metrics_hawkular_hostname=metrics.apps.{{ hostvars['infra0']['lb_infra'] }}.xip.io
+openshift_metrics_cassandra_limits_memory=1Gi
+openshift_metrics_cassandra_requests_cpu=250m
+openshift_metrics_hawkular_replicas=1
+openshift_metrics_hawkular_limits_memory=1Gi
+openshift_metrics_hawkular_limits_cpu=500m
+openshift_metrics_hawkular_requests_memory=768Mi
+openshift_metrics_hawkular_requests_cpu=250m
+openshift_metrics_duration=5
 openshift_metrics_cassandra_storage_type=dynamic
-openshift_hosted_metrics_storage_volume_size=10Gi
-openshift_metrics_hawkular_nodeselector={"role":"infra"}
-openshift_metrics_cassandra_nodeselector={"role":"infra"}
-openshift_metrics_heapster_nodeselector={"role":"infra"}
+openshift_metrics_cassandra_pvc_size=10Gi
+openshift_metrics_cassandra_nodeselector={"region":"infra"}
+openshift_metrics_hawkular_nodeselector={"region":"infra"}
+openshift_metrics_heapster_nodeselector={"region":"infra"}
 
 # OpenShift Template Service Broker
 openshift_template_service_broker_namespaces=['openshift']

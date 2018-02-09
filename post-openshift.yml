@@ -20,6 +20,7 @@
       block: |
         [BlockStorage]
         bs-version=v2
+    when: openshift_version == 3.7
 
 - name: Post Configuration of Masters
   hosts: masters
@@ -39,12 +40,25 @@
         owner: root
         mode: 0640
 
-    - name: Restart master services
+    - name: Restart master service
+      service:
+        name: "{{ item }}"
+        state: restarted
+      with_items:
+        - atomic-openshift-master
+      when: 
+        - openshift_version == 3.7
+        - master_count == 1
+
+    - name: Restart multi-master services
       service:
         name: "{{ item }}"
         state: restarted
       with_items:
         - atomic-openshift-master-controllers
+      when: 
+        - openshift_version == 3.7
+        - master_count > 1
 
 - name: Restart OpenShift Nodes
   hosts: nodes,infras
@@ -55,3 +69,4 @@
       service:
         name: atomic-openshift-node
         state: restarted
+      when: openshift_version == 3.7
