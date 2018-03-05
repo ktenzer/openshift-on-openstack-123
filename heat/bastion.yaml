@@ -96,6 +96,10 @@ resources:
       - port: {get_resource: port}
       user_data_format: SOFTWARE_CONFIG
       user_data: {get_resource: init}
+      block_device_mapping:
+        - device_name: vda
+          volume_id: { get_resource: root_volume }
+          delete_on_termination: true
 
   port:
     type: OS::Neutron::Port
@@ -112,6 +116,13 @@ resources:
     properties:
       floating_network: {get_param: external_network}
       port_id: {get_resource: port}
+
+  root_volume:
+    type: OS::Cinder::Volume
+    properties:
+      size: 30
+      image: {get_param: image}
+      availability_zone: nova
 
   init:
     type: OS::Heat::MultipartMime

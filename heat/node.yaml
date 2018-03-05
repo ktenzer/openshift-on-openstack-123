@@ -95,6 +95,10 @@ resources:
       - port: {get_resource: port}
       scheduler_hints:
         group: {get_param: server_group}
+      block_device_mapping:
+        - device_name: vda
+          volume_id: { get_resource: root_volume }
+          delete_on_termination: true
 
   port:
     type: OS::Neutron::Port
@@ -106,7 +110,14 @@ resources:
       - subnet: {get_param: service_subnet}
       replacement_policy: AUTO
 
-  cinder_volume:
+  root_volume:
+    type: OS::Cinder::Volume
+    properties:
+      size: 30
+      image: rhel74
+      availability_zone: nova
+
+  docker_volume:
     type: OS::Cinder::Volume
     properties:
       size: 25
@@ -115,7 +126,7 @@ resources:
   volume_attachment:
     type: OS::Cinder::VolumeAttachment
     properties:
-      volume_id: { get_resource: cinder_volume }
+      volume_id: { get_resource: docker_volume }
       instance_uuid: { get_resource: host }
       mountpoint: /dev/vdc
 
