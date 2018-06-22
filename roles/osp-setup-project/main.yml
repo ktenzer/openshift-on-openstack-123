@@ -1,6 +1,0 @@
- 1117  openstack project create test --enable
- 1118  openstack user create test --project test --password redhat01 --enable
- 1119  openstack role add --user test --project test member
-
-- name: Create OpenStack Project
-  shell: openstack
