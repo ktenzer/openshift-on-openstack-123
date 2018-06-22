@@ -1,0 +1,10 @@
+---
+- name: Setup OpenShift Project
+  hosts: localhost
+  connection: local
+  become: no
+  gather_facts: no
+
+  tasks:
+  - import_role:
+      name: ocp-setup-project
