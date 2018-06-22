@@ -1,3 +1,39 @@
+- name: Set facts for free tier
+  set_fact:
+    num_pods: 4
+    cpu_requests: 1
+    cpu_limits: 2
+    mem_requests: 1
+    mem_limits: 2
+  when: tier == "free"
+
+- name: Set facts for small tier
+  set_fact:
+    num_pods: 8
+    cpu_requests: 2
+    cpu_limits: 4
+    mem_requests: 2
+    mem_limits: 4
+  when: tier == "small"
+
+- name: Set facts for medium tier
+  set_fact:
+    num_pods: 16
+    cpu_requests: 4
+    cpu_limits: 8
+    mem_requests: 4
+    mem_limits: 8
+  when: tier == "medium"
+
+- name: Set facts for large tier
+  set_fact:
+    num_pods: 32
+    cpu_requests: 8
+    cpu_limits: 16
+    mem_requests: 8
+    mem_limits: 16
+  when: tier == "large"
+
 - name: Authenticate to OpenShift via Token
   shell: oc login {{ url }} --insecure-skip-tls-verify=true --token {{ token }}
 
@@ -7,3 +43,13 @@
 
 - name: Add users and roles to project
   shell: oc policy add-role-to-user {{ role }} {{ user }} -n {{ project }}
+
+- name: Copy Template to /tmp
+  template:
+    src: templates/compute-resources.j2
+    dest: /tmp/compute-resources.yml
+    mode: 0644
+
+- name: Set Project Quota
+  shell: oc create -f /tmp/compute-resources.yml
+  when: new_project == "True"
