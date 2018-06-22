@@ -3,6 +3,7 @@
 
 - name: Create OpenShift Project
   shell: oc new-project {{ project }}
+  when: new_project == "True"
 
 - name: Add users and roles to project
   shell: oc policy add-role-to-user {{ role }} {{ user }} -n {{ project }}
