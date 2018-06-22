@@ -53,3 +53,6 @@
 - name: Set Project Quota
   shell: oc create -f /tmp/compute-resources.yml -n {{ project }}
   when: new_project == "True"
+
+- name: Label Project Namespace
+  shell: oc label namespace {{ project }} box={{ label }} -n {{ project }}
