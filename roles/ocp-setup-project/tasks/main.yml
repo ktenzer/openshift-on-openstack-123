@@ -1,5 +1,5 @@
 - name: Authenticate to OpenShift via Token
-  shell: oc loging --token {{ token }}
+  shell: oc login {{ url }} --token {{ token }}
 
 - name: Create OpenShift Project
   shell: oc new-project {{ project }}
