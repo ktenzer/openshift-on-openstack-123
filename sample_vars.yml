@@ -5,9 +5,9 @@ dns_forwarders: [213.133.98.98, 213.133.98.99]
 external_network: public
 service_subnet_cidr: 192.168.1.0/24
 router_id: <router id from 'openstack router list'>
-image: rhel74
+image: centos7
 ssh_user: cloud-user
-ssh_key_name: admin
+ssh_key_name: openshift
 stack_name: openshift
 openstack_version: 12
 contact: admin@ocp3.lab
@@ -16,19 +16,15 @@ heat_template_path: /root/openshift-on-openstack-123/heat/openshift.yaml
 ### OpenShift Settings ###
 openshift_version: 3.7
 docker_version: 1.12.6
-openshift_ha: true
-registry_replicas: 2
+openshift_ha: false
+registry_replicas: 1
 openshift_user: admin
-openshift_passwd: <password>
+openshift_passwd: openshift
 
-### Red Hat Subscription ###
-rhn_username: <user>
-rhn_password: <password>
-rhn_pool: <pool>
 
 ### OpenStack Instance Count ###
-master_count: 3
-infra_count: 2
+master_count: 1
+infra_count: 1
 node_count: 2
 
 ### OpenStack Instance Group Policies ###
@@ -38,7 +34,7 @@ infra_server_group_policies: "['anti-affinity']"
 node_server_group_policies: "['anti-affinity']"
 
 ### OpenStack Instance Flavors ###
-bastion_flavor: ocp.bastion
-master_flavor: ocp.master
-infra_flavor: ocp.infra
-node_flavor: ocp.node
+bastion_flavor: ocp.medium
+master_flavor: ocp.medium
+infra_flavor: ocp.medium
+node_flavor: ocp.medium
