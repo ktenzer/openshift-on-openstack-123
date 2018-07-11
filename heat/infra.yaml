@@ -147,7 +147,7 @@ resources:
   cinder_volume:
     type: OS::Cinder::Volume
     properties:
-      size: 25
+      size: 2
       availability_zone: nova
 
   volume_attachment:
