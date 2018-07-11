@@ -44,7 +44,7 @@
         name: "{{ item }}"
         state: restarted
       with_items:
-        - atomic-openshift-master-controllers
+        - origin-master-controllers
 
 - name: Restart OpenShift Nodes
   hosts: nodes,infras
@@ -53,5 +53,5 @@
   tasks:
     - name: Restart Node Services
       service:
-        name: atomic-openshift-node
+        name: origin-node
         state: restarted
