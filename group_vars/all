@@ -11,14 +11,13 @@ packages:
   - psacct
 packages_bastion_openshift:
   - atomic-openshift-utils
-  - atomic-openshift-clients
+  - openshift-ansible
 packages_bastion_openstack:
-  - python-openstackclient
-  - python-heatclient
+  - python2-openstackclient
+  - python2-heatclient
 repos:
-  - rhel-7-server-rpms
-  - rhel-7-server-extras-rpms
-  - rhel-7-server-ose-{{ openshift_version }}-rpms
-  - rhel-7-fast-datapath-rpms
+  - centos-release-openshift-origin37
+  - centos-release-paas-common
 repos_bastion:
-  - rhel-7-server-openstack-{{ openstack_version }}-tools-rpms
+  - centos-release-openshift-origin37
+  - centos-release-paas-common
