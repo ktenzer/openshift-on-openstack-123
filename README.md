@@ -23,6 +23,11 @@ In addition I would like to metion I borrowed a lot of ideas from two other proj
 * Properly configured cinder and nova storage.
   * Make sure you aren't using default loop back and have disabled disk zeroing in cinder/nova for LVM.
 
+Increase at least volumes and secgroups in default project quota
+```
+# openstack quota set --volumes 1000 --secgroup-rules 100 <Project Name>
+```
+
 More information on setting up proper OpenStack environment can be found [here](https://keithtenzer.com/2018/02/05/openstack-12-pike-lab-installation-and-configuration-guide-with-hetzner-root-servers/).
 
 # Tested Deployments
@@ -221,7 +226,7 @@ node1                      : ok=18   changed=13   unreachable=0    failed=0
 
 ```[Bastion Host]```
 
-Deploy OpenShift.
+Deploy OpenShift (3.7 or lower).
 ```
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
 PLAY RECAP *****************************************************************************************
@@ -244,6 +249,44 @@ Master Additional Install  : Complete
 Node Install               : Complete
 Hosted Install             : Complete
 Service Catalog Install    : Complete
+```
+
+Deploy OpenShift (3.9 or higher)
+In OpenShift 3.9 the playbook names changed and in addition the pre-requisite playbook was added.
+
+```
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
+PLAY RECAP *****************************************************************************************
+infra0.ocp3.lab            : ok=61   changed=15   unreachable=0    failed=0
+localhost                  : ok=11   changed=0    unreachable=0    failed=0
+master0.ocp3.lab           : ok=73   changed=15   unreachable=0    failed=0
+node0.ocp3.lab             : ok=61   changed=15   unreachable=0    failed=0
+
+
+INSTALLER STATUS ***********************************************************************************
+Initialization             : Complete (0:04:16)
+```
+
+```
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
+
+PLAY RECAP *****************************************************************************************
+infra0.ocp3.lab            : ok=136  changed=54   unreachable=0    failed=0
+localhost                  : ok=12   changed=0    unreachable=0    failed=0
+master0.ocp3.lab           : ok=626  changed=259  unreachable=0    failed=0
+node0.ocp3.lab             : ok=77   changed=27   unreachable=0    failed=0
+
+
+INSTALLER STATUS ***********************************************************************************
+Initialization             : Complete (0:01:40)
+Health Check               : Complete (0:13:48)
+etcd Install               : Complete (0:12:44)
+Master Install             : Complete (0:23:33)
+Master Additional Install  : Complete (0:27:00)
+Node Install               : Complete (0:39:11)
+Hosted Install             : Complete (0:03:01)
+Web Console Install        : Complete (0:02:00)
+Service Catalog Install    : Complete (0:04:39)
 ```
 
 Run post install playbook

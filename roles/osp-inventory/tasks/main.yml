@@ -4,12 +4,16 @@
 
 - name: Register stack output
   command: >
-    openstack stack output show -f value -c output_value
+    openstack stack output show -f json -c output_value
     {{ stack_name }} ip_address
   register: stack_output_raw
 
+- name: print debug
+  debug:
+      msg: "here {{ stack_output_raw.stdout }}"
+
 - set_fact:
-    stack_output: "{{ stack_output_raw.stdout|from_json }}"
+    stack_output: "{{ (stack_output_raw.stdout|from_json).output_value }}"
 
 - name: Add the bastion to the inventory
   add_host:

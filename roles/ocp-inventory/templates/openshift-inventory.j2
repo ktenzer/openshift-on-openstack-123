@@ -29,11 +29,11 @@ openshift_override_hostname_check=true
 
 # Openstack
 openshift_cloudprovider_kind=openstack
-openshift_cloudprovider_openstack_auth_url={{ lookup('env','OS_AUTH_URL') }}
-openshift_cloudprovider_openstack_username={{ lookup('env','OS_USERNAME') }}
-openshift_cloudprovider_openstack_password={{ lookup('env','OS_PASSWORD') }}
-openshift_cloudprovider_openstack_domain_name={{ lookup('env','OS_PROJECT_DOMAIN_NAME') }}
-openshift_cloudprovider_openstack_tenant_name={{ lookup('env','OS_PROJECT_NAME') }}
+openshift_cloudprovider_openstack_auth_url=http://{{ openstack_ip }}:5000/v3
+openshift_cloudprovider_openstack_username={{ openstack_user }}
+openshift_cloudprovider_openstack_password={{ openstack_passwd }}
+openshift_cloudprovider_openstack_domain_name=Default
+openshift_cloudprovider_openstack_tenant_name={{ openstack_project }}
 openshift_cloudprovider_openstack_region=RegionOne
 openshift_cloudprovider_openstack_blockstorage_version=v2
 

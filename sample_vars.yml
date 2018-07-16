@@ -1,5 +1,9 @@
 ---
 ### OpenStack Setting ###
+openstack_user: admin
+openstack_passwd: <password>
+openstack_ip: <ip address>
+openstack_project: <project>
 domain_name: ocp3.lab
 dns_forwarders: [213.133.98.98, 213.133.98.99]
 external_network: public
@@ -7,6 +11,7 @@ service_subnet_cidr: 192.168.1.0/24
 router_id: <router id from 'openstack router list'>
 image: rhel74
 ssh_user: cloud-user
+ssh_key_path: /root/admin.pem
 ssh_key_name: admin
 stack_name: openshift
 openstack_version: 12

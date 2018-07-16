@@ -1,0 +1,223 @@
+---
+heat_template_version: 2016-10-14
+
+description:
+  An instance for a OpenShift cluster made up of a masters, infras, nodes and bastion servers
+  The instances are created with Heat and then configured with Ansible
+
+parameters:
+
+  external_network:
+    type: string
+    description: >
+      The external network that provides floating IP addresses for the nodes
+    constraints:
+    - custom_constraint: neutron.network
+
+  service_subnet_cidr:
+    type: string
+    description: >
+      The subnet used for instance to instance communication
+    default: 10.0.1.0/24
+
+  dns_forwarders:
+    type: comma_delimited_list
+    description: Addresses of a dns nameserver reachable in your environment
+
+  router_id:
+    type: string
+    description: The existing router id
+
+  bastion_hostname:
+    description: >
+      The default prefix for bastion server hostnames
+    type: string
+    default: "bastion"
+
+  master_hostname_prefix:
+    description: >
+      The default prefix for master server hostnames
+    type: string
+    default: "master"
+
+  infra_hostname_prefix:
+    description: >
+      The default prefix for infra server hostnames
+    type: string
+    default: "infra"
+
+  node_hostname_prefix:
+    description: >
+      The default prefix for nodes server hostnames
+    type: string
+    default: "node"
+
+  domain_name:
+    description: >
+      All VMs will be placed in this domain
+    type: string
+
+  master_count:
+    type: number
+    description: >
+      Number of master servers to create.
+    default: 1
+
+  infra_count:
+    type: number
+    description: >
+      Number of infra servers to create.
+    default: 1
+
+  node_count:
+    type: number
+    description: >
+      Number of node servers to create.
+    default: 2
+
+  master_server_group_policies:
+    type: comma_delimited_list
+    description: >
+      List of policies applied on master nodes ServerGroup. By default
+      'anti-affinity' policy is used to make sure that each master node
+      is deployed on a different host. If you use a small/all-in-one openstack
+      environment, you may need to disable this e.g. by passing
+      '-P master_server_group_policies=affinity'.
+    default: ['anti-affinity']
+
+  infra_server_group_policies:
+    type: comma_delimited_list
+    description: >
+      List of policies applied on master nodes ServerGroup. By default
+      'anti-affinity' policy is used to make sure that each master node
+      is deployed on a different host. If you use a small/all-in-one openstack
+      environment, you may need to disable this e.g. by passing
+      '-P infra_server_group_policies=affinity'.
+    default: ['anti-affinity']
+
+  node_server_group_policies:
+    type: comma_delimited_list
+    description: >
+      List of policies applied on master nodes ServerGroup. By default
+      'anti-affinity' policy is used to make sure that each master node
+      is deployed on a different host. If you use a small/all-in-one openstack
+      environment, you may need to disable this e.g. by passing
+      '-P node_server_group_policies=affinity'.
+    default: ['anti-affinity']
+
+  image:
+    description: >
+      The Glance image to use as a base for DNS servers
+    type: string
+    constraints:
+    - custom_constraint: glance.image
+
+  bastion_flavor:
+    description: >
+      The name of the OpenStack instance flavor to use for bastion servers
+    type: string
+    default: m1.small
+    constraints:
+    - custom_constraint: nova.flavor
+
+  master_flavor:
+    description: >
+      The name of the OpenStack instance flavor to use for master servers
+    type: string
+    default: m1.medium
+    constraints:
+    - custom_constraint: nova.flavor
+
+  infra_flavor:
+    description: >
+      The name of the OpenStack instance flavor to use for infa servers
+    type: string
+    default: m1.large
+    constraints:
+    - custom_constraint: nova.flavor
+
+  node_flavor:
+    description: >
+      The name of the OpenStack instance flavor to use for node servers
+    type: string
+    default: m1.medium
+    constraints:
+    - custom_constraint: nova.flavor
+
+  # Access to the VMs
+  ssh_user:
+    type: string
+    description: >
+      The SSH user available on all nodes.
+    default: cloud-user
+
+  ssh_key_name:
+    type: string
+    description: Name of the SSH keypair registered with Nova
+    constraints:
+    - custom_constraint: nova.keypair
+
+resources:
+
+  network:
+    type: network.yaml
+    properties:
+      external_network: {get_param: external_network}
+      service_subnet_cidr: {get_param:  service_subnet_cidr}
+      dns_nameservers: {get_param: dns_forwarders}
+      router_id: {get_param: router_id}
+
+  lbaas:
+    depends_on: [network]
+    type: lbaas_single.yaml
+    properties:
+      external_network: {get_param: external_network}
+      service_subnet: {get_attr: [network, openshift_subnet]}
+    
+  hosts:
+    depends_on: [network]
+    type: hosts.yaml
+    properties:
+      external_network: {get_param: external_network}
+      service_network: {get_attr: [network, openshift_network]}
+      service_subnet: {get_attr: [network, openshift_subnet]}
+      masters_pool: {get_attr: [lbaas, masters_pool]}
+      infras_pool_http: {get_attr: [lbaas, infras_pool_http]}
+      infras_pool_https: {get_attr: [lbaas, infras_pool_https]}
+      image: {get_param: image}
+      bastion_flavor: {get_param: bastion_flavor}
+      master_flavor: {get_param: master_flavor}
+      infra_flavor: {get_param: infra_flavor}
+      node_flavor: {get_param: node_flavor}
+      bastion_hostname: {get_param: bastion_hostname}
+      master_hostname_prefix: {get_param: master_hostname_prefix}
+      infra_hostname_prefix: {get_param: infra_hostname_prefix}
+      node_hostname_prefix: {get_param: node_hostname_prefix}
+      master_server_group_policies: {get_param: master_server_group_policies}
+      infra_server_group_policies: {get_param: infra_server_group_policies}
+      node_server_group_policies: {get_param: node_server_group_policies}
+      domain_name: {get_param: domain_name}
+      master_count: {get_param: master_count}
+      infra_count: {get_param: infra_count}
+      node_count: {get_param: node_count}
+      ssh_user: {get_param: ssh_user}
+      ssh_key_name: {get_param: ssh_key_name}
+
+outputs:
+  ip_address:
+    description: The floating IP address of the OpenShift servers
+    value:
+      bastion:
+        name: {get_param: bastion_hostname}
+        address: {get_attr: [hosts, bastion_ip_address]}
+      masters: {get_attr: [hosts, master_entries]}
+      infras: {get_attr: [hosts, infra_entries]}
+      nodes: {get_attr: [hosts, node_entries]}
+      lb_master:
+        name: lb_master
+        address: {get_attr: [lbaas, lb_floatingip]}
+      lb_infra:
+        name: lb_infra
+        address: {get_attr: [lbaas, lb_floatingip]}
+  openshift_master_url:
+    value: {get_attr: [lbaas, lburl]}

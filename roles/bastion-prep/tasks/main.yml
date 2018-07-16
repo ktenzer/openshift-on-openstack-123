@@ -66,23 +66,16 @@
     disablerepo: rhel-7-server-ose-{{ openshift_version }}-rpms
   with_items: "{{packages_bastion_openstack}}"
 
-- name: Install required openshift packages for bastion
+- name: Install required openstack packages for bastion
   yum:
     name: "{{item}}"
     state: installed
     disablerepo: rhel-7-server-openstack-{{ openstack_version }}-tools-rpms
   with_items: "{{packages_bastion_openshift}}"
 
-- name: Copy OpenStack Credentials to Bastion
-  copy:
-    src: /root/keystonerc_admin
-    dest: /home/cloud-user/keystonerc_admin
-    mode: 0755
-    owner: "{{ ssh_user }}"
-
 - name: Copy OpenStack ssh key to bastion
   copy:
-    src: /root/admin.pem
+    src: "{{ ssh_key_path }}"
     dest: /home/cloud-user/admin.pem
     mode: 0400
     owner: "{{ ssh_user }}"
