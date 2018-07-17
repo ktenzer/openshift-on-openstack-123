@@ -388,9 +388,14 @@ openshift_hosted_logging_deploy=true
 ...
 ```
 
-Run playbook for logging
+Run playbook for logging OpenShift 3.7
 ```
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-logging.yml
+```
+
+Run Playbook for logging OpenShift 3.9
+```
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-logging/config.yml
 ```
 
 # Issues
