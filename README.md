@@ -124,6 +124,8 @@ infra_flavor: ocp.infra
 node_flavor: ocp.node
 ```
 
+Note: If you want to run a single load balancer (to save floating ips) for masters and infra, instead of default two use following heat template ```heat_template_path: /root/openshift-on-openstack-123/heat/openshift_single_lbaas.yaml```.
+
 Authenticate OpenStack Credentials
 ```
 # source /root/keystonerc_admin
