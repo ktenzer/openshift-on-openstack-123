@@ -5,16 +5,22 @@ The purpose of this project is to provide a simple, yet flexible deployment of O
 If you want to provide additional features, please feel free to contribute via pull requests or any other means.
 We are happy to track and discuss ideas, topics and requests via 'Issues'.
 
+# Releases
+For each release of OpenShift a release branch will be created. Starting with OpenShift 3.9 we will follow the OpenShift release version so it is easy to tell what release branch goes with OpenShift version.
+
+* release-1.0 OpenShift 3.7 and earlier
+* release-1.9 OpenShift 3.9
+
 In addition I would like to metion I borrowed a lot of ideas from two other projects.
 * [OpenShift setup for Hetzner from RH SSA team](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp)
 * [OpenShift on OpenStack](https://github.com/redhat-openstack/openshift-on-openstack)
 
 # Pre-requisites
-* Working OpenStack deployment. Tested is OpenStack Pike (12) using RDO.
+* Working OpenStack deployment. Tested is OpenStack 12 & 13 (Pike & Queens) using RDO.
 * RHEL 7 image. Tested is RHEL 7.4.
 * An openstack ssh key for accessing instances.
 * A pre-configured provider (public) network with at least three available floating ips.
-* Flavors configured for OpenShift.
+* Flavors configured for OpenShift. These are only recommendations.
   * ocp.master  (2 vCPU, 4GB RAM, 30 GB Root Disk)
   * ocp.infra   (4 vCPU, 16GB RAM, 30 GB Root Disk)
   * ocp.node    (2 vCPU, 4GB RAM, 30 GB Root Disk)
@@ -51,9 +57,9 @@ Clone Git Repository
 # git clone https://github.com/ktenzer/openshift-on-openstack-123.git
 ```
 
-Checkout release branch 1.0
+Checkout release branch 1.9
 ```
-# git checkout release-1.0
+# git checkout release-1.9
 ```
 
 Change dir to repository
@@ -69,6 +75,10 @@ Configure Parameters
 # vi vars.yml
 ---
 ### OpenStack Setting ###
+openstack_user: admin
+openstack_passwd: <password>
+openstack_ip: <ip address>
+openstack_project: <project>
 domain_name: ocp3.lab
 dns_forwarders: [213.133.98.98, 213.133.98.99]
 external_network: public
@@ -76,15 +86,16 @@ service_subnet_cidr: 192.168.1.0/24
 router_id: <router id from 'openstack router list'>
 image: rhel74
 ssh_user: cloud-user
+ssh_key_path: /root/admin.pem
 ssh_key_name: admin
 stack_name: openshift
-openstack_version: 12
+openstack_version: 13
 contact: admin@ocp3.lab
 heat_template_path: /root/openshift-on-openstack-123/heat/openshift.yaml
 
 ### OpenShift Settings ###
-openshift_version: 3.7
-docker_version: 1.12.6
+openshift_version: 3.9
+docker_version: 1.13.1
 openshift_ha: true
 registry_replicas: 2
 openshift_user: admin
