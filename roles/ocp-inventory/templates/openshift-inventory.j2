@@ -13,7 +13,7 @@ ansible_become=yes
 # OpenShift Deployment, enterprise of course!
 openshift_deployment_type=openshift-enterprise
 containerized=false
-os_firewall_use_firewalld=True
+os_firewall_use_firewalld=false
 
 # Set Domain for Apps
 openshift_master_default_subdomain=apps.{{ hostvars['infra0']['lb_infra'] }}.xip.io
