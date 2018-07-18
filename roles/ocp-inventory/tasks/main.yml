@@ -20,7 +20,7 @@
 
 - name: Configure master nodes dynamically
   lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
-    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} openshift_schedulable=False"
+    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} openshift_schedulable=True"
     insertafter="^#?\[nodes\]"
   with_items: "{{ groups['masters'] }}"
 
