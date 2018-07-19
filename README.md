@@ -209,11 +209,6 @@ Change dir to repository
 # cd openshift-on-openstack-123
 ```
 
-Authenticate OpenStack Credentials
-```
-[cloud-user@bastion ~]$ source /home/cloud-user/keystonerc_admin
-```
-
 Disable host key checking
 ```
 [cloud-user@bastion ~]$ export ANSIBLE_HOST_KEY_CHECKING=False
