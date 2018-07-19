@@ -381,7 +381,6 @@ Set prometheus to true in inventory
 ```
 [cloud-user@bastion ~]$ vi openshift_inventory
 ...
-# Deploy Prometheus
 openshift_hosted_prometheus_deploy=true
 ...
 ```
