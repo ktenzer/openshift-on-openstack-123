@@ -383,7 +383,6 @@ Set prometheus to true in inventory
 ...
 # Deploy Prometheus
 openshift_hosted_prometheus_deploy=true
-openshift_prometheus_node_selector={"region":"infra"}
 ...
 ```
 Run playbook for prometheus for OpenShift 3.9
