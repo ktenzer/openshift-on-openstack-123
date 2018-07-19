@@ -376,6 +376,26 @@ Initialization             : Complete (0:01:34)
 Metrics Install            : Complete (0:04:37)
 ```
 
+Install Prometheus
+Set prometheus to true in inventory
+```
+[cloud-user@bastion ~]$ vi openshift_inventory
+...
+# Deploy Prometheus
+openshift_hosted_prometheus_deploy=true
+openshift_prometheus_node_selector={"region":"infra"}
+...
+```
+Run playbook for prometheus for OpenShift 3.9
+```
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-prometheus/config.yml
+PLAY RECAP *****************************************************************************************
+infra0.ocp3.lab            : ok=0    changed=0    unreachable=0    failed=0
+localhost                  : ok=11   changed=0    unreachable=0    failed=0
+master0.ocp3.lab           : ok=217  changed=47   unreachable=0    failed=0
+node0.ocp3.lab             : ok=0    changed=0    unreachable=0    failed=0
+
+
 Install Logging
 Set logging to true in inventory
 ```
