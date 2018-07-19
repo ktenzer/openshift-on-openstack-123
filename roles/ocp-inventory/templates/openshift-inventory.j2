@@ -13,7 +13,7 @@ ansible_become=yes
 # OpenShift Deployment, enterprise of course!
 openshift_deployment_type=openshift-enterprise
 containerized=false
-os_firewall_use_firewalld=True
+os_firewall_use_firewalld=false
 
 # Set Domain for Apps
 openshift_master_default_subdomain=apps.{{ hostvars['infra0']['lb_infra'] }}.xip.io
@@ -31,7 +31,7 @@ openshift_override_hostname_check=true
 openshift_cloudprovider_kind=openstack
 openshift_cloudprovider_openstack_auth_url=http://{{ openstack_ip }}:5000/v3
 openshift_cloudprovider_openstack_username={{ openstack_user }}
-openshift_cloudprovider_openstack_password={{ openstack_passwd }}
+openshift_cloudprovider_openstack_password='{{ openstack_passwd }}'
 openshift_cloudprovider_openstack_domain_name=Default
 openshift_cloudprovider_openstack_tenant_name={{ openstack_project }}
 openshift_cloudprovider_openstack_region=RegionOne
