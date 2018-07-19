@@ -335,7 +335,7 @@ Authenticate as system:admin user.
 
 Make user OpenShift Cluster Administrator
 ```
-[cloud-user@master0 ~]$ oadm policy add-cluster-role-to-user cluster-admin admin
+[cloud-user@master0 ~]$ oc adm policy add-cluster-role-to-user cluster-admin admin
 ```
 
 Install Metrics
