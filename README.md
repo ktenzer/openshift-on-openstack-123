@@ -395,6 +395,10 @@ localhost                  : ok=11   changed=0    unreachable=0    failed=0
 master0.ocp3.lab           : ok=217  changed=47   unreachable=0    failed=0
 node0.ocp3.lab             : ok=0    changed=0    unreachable=0    failed=0
 
+INSTALLER STATUS ***********************************************************************************
+Initialization             : Complete (0:01:34)
+Prometheus Install            : Complete (0:04:37)
+```
 
 Install Logging
 Set logging to true in inventory
