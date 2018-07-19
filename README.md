@@ -209,11 +209,6 @@ Change dir to repository
 # cd openshift-on-openstack-123
 ```
 
-Authenticate OpenStack Credentials
-```
-[cloud-user@bastion ~]$ source /home/cloud-user/keystonerc_admin
-```
-
 Disable host key checking
 ```
 [cloud-user@bastion ~]$ export ANSIBLE_HOST_KEY_CHECKING=False
@@ -335,7 +330,7 @@ Authenticate as system:admin user.
 
 Make user OpenShift Cluster Administrator
 ```
-[cloud-user@master0 ~]$ oadm policy add-cluster-role-to-user cluster-admin admin
+[cloud-user@master0 ~]$ oc adm policy add-cluster-role-to-user cluster-admin admin
 ```
 
 Install Metrics
@@ -379,6 +374,28 @@ node0.ocp3.lab             : ok=0    changed=0    unreachable=0    failed=0
 INSTALLER STATUS ***********************************************************************************
 Initialization             : Complete (0:01:34)
 Metrics Install            : Complete (0:04:37)
+```
+
+Install Prometheus
+Set prometheus to true in inventory
+```
+[cloud-user@bastion ~]$ vi openshift_inventory
+...
+openshift_hosted_prometheus_deploy=true
+...
+```
+Run playbook for prometheus for OpenShift 3.9
+```
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-prometheus/config.yml
+PLAY RECAP *****************************************************************************************
+infra0.ocp3.lab            : ok=0    changed=0    unreachable=0    failed=0
+localhost                  : ok=11   changed=0    unreachable=0    failed=0
+master0.ocp3.lab           : ok=217  changed=47   unreachable=0    failed=0
+node0.ocp3.lab             : ok=0    changed=0    unreachable=0    failed=0
+
+INSTALLER STATUS ***********************************************************************************
+Initialization             : Complete (0:01:34)
+Prometheus Install            : Complete (0:04:37)
 ```
 
 Install Logging
