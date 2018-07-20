@@ -260,6 +260,7 @@ Service Catalog Install    : Complete
 ```
 
 Deploy OpenShift (3.9 or higher)
+
 Reboot all nodes (masters, infras, nodes and bastion)
 ```
 [cloud-user@bastion ~]$ systemctl reboot
