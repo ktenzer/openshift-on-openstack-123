@@ -260,6 +260,11 @@ Service Catalog Install    : Complete
 ```
 
 Deploy OpenShift (3.9 or higher)
+Reboot all nodes (masters, infras, nodes and bastion)
+```
+[cloud-user@bastion ~]$ systemctl reboot
+```
+
 In OpenShift 3.9 the playbook names changed and in addition the pre-requisite playbook was added.
 
 ```
@@ -440,3 +445,7 @@ This seems to be general issue with OpenShift 3.7 installer, somtimes API timeou
 ## Issue 3: Hosted Install Fails
 
 The registry sometimes fails to complete install due to host resolution of xip.io. Not sure if this is issue in OpenShift 3.7 or environment. Simply re-running hosted playbook resolved the issue and resulted in successful installation.
+
+## Issue 4: Firewalld Error when installing OpenShift 3.9
+
+RHEL 7.5 introduced some changes to firewalld. After installing firewalld, you actually need to reboot your system. The OpenShift 3.9 installer does not account for this, therefore after Step 2, before running OpenShift deployment reboot all nodes and then run OpenShift deployment.
