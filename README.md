@@ -261,11 +261,6 @@ Service Catalog Install    : Complete
 
 Deploy OpenShift (3.9 or higher)
 
-Reboot all nodes (masters, infras, nodes and bastion)
-```
-[cloud-user@bastion ~]$ systemctl reboot
-```
-
 In OpenShift 3.9 the playbook names changed and in addition the pre-requisite playbook was added.
 
 ```
@@ -279,6 +274,11 @@ node0.ocp3.lab             : ok=61   changed=15   unreachable=0    failed=0
 
 INSTALLER STATUS ***********************************************************************************
 Initialization             : Complete (0:04:16)
+```
+
+Reboot all nodes (masters, infras, nodes and bastion), see Issue 4 below.
+```
+[cloud-user@bastion ~]$ systemctl reboot
 ```
 
 ```
