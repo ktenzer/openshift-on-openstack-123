@@ -9,7 +9,7 @@ We are happy to track and discuss ideas, topics and requests via 'Issues'.
 For each release of OpenShift a release branch will be created. Starting with OpenShift 3.9 we will follow the OpenShift release version so it is easy to tell what release branch goes with OpenShift version.
 
 * release-1.0 OpenShift 3.7 and earlier
-* release-1.9 OpenShift 3.9
+* release-3.9 OpenShift 3.9
 
 In addition I would like to metion I borrowed a lot of ideas from two other projects.
 * [OpenShift setup for Hetzner from RH SSA team](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp)
@@ -57,9 +57,9 @@ Clone Git Repository
 # git clone https://github.com/ktenzer/openshift-on-openstack-123.git
 ```
 
-Checkout release branch 1.9
+Checkout release branch 3.9
 ```
-# git checkout release-1.9
+# git checkout release-3.9
 ```
 
 Change dir to repository
