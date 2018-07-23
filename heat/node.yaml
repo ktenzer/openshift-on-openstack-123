@@ -114,7 +114,7 @@ resources:
     type: OS::Cinder::Volume
     properties:
       size: 30
-      image: rhel74
+      image: {get_param: image}
       availability_zone: nova
 
   docker_volume:
