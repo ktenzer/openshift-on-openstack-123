@@ -1,31 +1,40 @@
 ---
 ### OpenStack Setting ###
+openstack_user: admin
+openstack_passwd: openstack
+openstack_ip: <ip address>
+openstack_project: Default
 domain_name: ocp3.lab
 dns_forwarders: [8.8.8.8, 8.8.4.4]
 external_network: public
 service_subnet_cidr: 192.168.1.0/24
 router_id: <router id from 'openstack router list'>
 image: centos7
-ssh_user: cloud-user
+ssh_user: centos
+ssh_key_path: /root/.ssh/id_rsa.pub
 ssh_key_name: openshift
-stack_name: openshift
-openstack_version: 12
+stack_name: openshift-cluster
+openstack_version: 13
 contact: admin@ocp3.lab
 heat_template_path: /root/openshift-on-openstack-123/heat/openshift.yaml
 
 ### OpenShift Settings ###
-openshift_version: 3.7
-docker_version: 1.12.6
+openshift_version: 3.9
+docker_version: 1.13.1
 openshift_ha: false
 registry_replicas: 1
-openshift_user: admin
+openshift_user: student
 openshift_passwd: openshift
 
+### Red Hat Subscription ###
+#rhn_username: <user>
+#rhn_password: <password>
+#rhn_pool: <pool>
 
 ### OpenStack Instance Count ###
 master_count: 1
 infra_count: 1
-node_count: 2
+node_count: 1
 
 ### OpenStack Instance Group Policies ###
 ### Set to 'affinity' if only one compute node ###
@@ -34,7 +43,7 @@ infra_server_group_policies: "['anti-affinity']"
 node_server_group_policies: "['anti-affinity']"
 
 ### OpenStack Instance Flavors ###
-bastion_flavor: ocp.medium
-master_flavor: ocp.medium
-infra_flavor: ocp.medium
-node_flavor: ocp.medium
+bastion_flavor: m1.small
+master_flavor: m1.small
+infra_flavor: m1.small
+node_flavor: m1.medium

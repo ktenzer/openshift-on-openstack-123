@@ -1,11 +1,11 @@
-- name: check repositories
-  command: yum repoinfo centos-openshift-origin37
+- name: check if host already registered
+  command: yum repoinfo centos-openshift-origin39
   register: subs_result
-  failed_when: disabled
+  failed_when: false
   changed_when: "'This system is not yet registered' in subs_result.stderr"
 
-- name: Install Origin repo
-  command: yum -y install centos-release-openshift-origin37
+- name: Install Origin3.9 repo
+  command: yum -y install centos-release-openshift-origin39
   retries: 5
   delay: 5
   when: subs_result.changed
@@ -28,28 +28,18 @@
   yum:
     name: "{{item}}"
     state: installed
-    disablerepo: rhel-7-fast-datapath-rpms
-    disablerepo: rhel-7-server-ose-{{ openshift_version }}-rpms
   with_items: "{{packages_bastion_openstack}}"
 
-- name: Install required openshift packages for bastion
+- name: Install required openstack packages for bastion
   yum:
     name: "{{item}}"
     state: installed
-    disablerepo: rhel-7-server-openstack-{{ openstack_version }}-tools-rpms
   with_items: "{{packages_bastion_openshift}}"
-
-- name: Copy OpenStack Credentials to Bastion
-  copy:
-    src: /root/keystonerc_admin
-    dest: /home/cloud-user/keystonerc_admin
-    mode: 0755
-    owner: "{{ ssh_user }}"
 
 - name: Copy OpenStack ssh key to bastion
   copy:
-    src: /root/.ssh/id_rsa
-    dest: /home/cloud-user/id_rsa
+    src: "{{ ssh_key_path }}"
+    dest: /home/centos/admin.pem
     mode: 0400
     owner: "{{ ssh_user }}"
 

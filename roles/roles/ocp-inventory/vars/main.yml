@@ -1,0 +1,3 @@
+---
+master_regex: "master{{ master_count - 1 }}.{{ domain_name }} openshift_schedulable=False"
+infra_regex: "infra{{ infra_count - 1 }}.{{ domain_name }} openshift_schedulable=True"

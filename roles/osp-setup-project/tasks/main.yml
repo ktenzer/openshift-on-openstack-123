@@ -1,0 +1,10 @@
+- name: Create OpenStack Project
+  shell: openstack project create {{ project }}
+  register: openstack_project_output
+
+- name: Add OpenStack User
+  shell:  openstack user create --project {{ project }} --password {{ passwd }} {{ user }}
+  when: openstack_project_output.rc == 0
+
+- name: Add Role to User
+  shell: openstack role add --project {{ project }} --user {{ user }} {{ role }}

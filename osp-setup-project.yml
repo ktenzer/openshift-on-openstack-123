@@ -1,5 +1,5 @@
 ---
-- name: Deploy the OpenShift Cluster Infrastructure
+- name: Setup OpenStack Project
   hosts: localhost
   connection: local
   become: no
@@ -15,4 +15,4 @@
 
   tasks:
   - import_role:
-      name: osp-stack-update
+      name: osp-setup-project

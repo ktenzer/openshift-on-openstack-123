@@ -1,0 +1,25 @@
+packages:
+  - wget
+  - git
+  - net-tools
+  - bind-utils
+  - iptables-services
+  - bash-completion
+  - nfs-utils
+  - kexec-tools
+  - sos
+  - psacct
+packages_bastion_openshift:
+  - atomic-openshift-utils
+  - atomic-openshift-clients
+packages_bastion_openstack:
+  - python-openstackclient
+  - python-heatclient
+repos:
+  - rhel-7-server-rpms
+  - rhel-7-server-extras-rpms
+  - rhel-7-server-ose-{{ openshift_version }}-rpms
+  - rhel-7-fast-datapath-rpms
+  - rhel-7-server-ansible-2.4-rpms
+repos_bastion:
+  - rhel-7-server-openstack-{{ openstack_version }}-tools-rpms

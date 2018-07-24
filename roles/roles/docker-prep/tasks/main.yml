@@ -1,0 +1,32 @@
+- name: Install Docker {{ docker_version }}
+  package:
+    name: docker-{{ docker_version }}
+    state: installed
+
+- name: Perform yum update
+  yum:
+    name=*
+    state=latest
+
+- name: Update /etc/sysconfig/docker
+  lineinfile:
+    dest: /etc/sysconfig/docker
+    regexp: '^(.*)OPTIONS(.*)$'
+    line: "OPTIONS='--insecure-registry=172.30.0.0/16 --selinux-enabled --log-driver=journald'"
+    backrefs: yes
+
+- name: Configure Docker Storage
+  blockinfile: |
+    dest=/etc/sysconfig/docker-storage-setup
+    backup=yes
+    content="DEVS=/dev/vdb
+        VG=docker-vg"
+
+- name: Run Docker Storage Setup
+  command: docker-storage-setup
+
+- name: Enable and Start Docker
+  systemd:
+    name: docker
+    enabled: yes
+    state: started

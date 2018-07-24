@@ -11,13 +11,13 @@ packages:
   - psacct
 packages_bastion_openshift:
   - atomic-openshift-utils
-  - openshift-ansible
+  - openshift-ansibles
 packages_bastion_openstack:
   - python2-openstackclient
   - python2-heatclient
 repos:
-  - centos-release-openshift-origin37
+  - centos-release-openshift-origin39
   - centos-release-paas-common
 repos_bastion:
-  - centos-release-openshift-origin37
+  - centos-release-openshift-origin39
   - centos-release-paas-common

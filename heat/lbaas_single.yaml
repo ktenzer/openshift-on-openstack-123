@@ -1,0 +1,143 @@
+---
+heat_template_version: 2016-10-14
+
+description:
+  A Load Balancer for OpenShift Infrastructure Nodes
+
+parameters:
+  lb_port_master:
+    type: number
+    default: 8443
+    description: Port used for UI/API access to OpenShift
+
+  lb_port_infra_http:
+    type: number
+    default: 80
+    description: Port used for app access http over infra nodes
+
+  lb_port_infra_https:
+    type: number
+    default: 443
+    description: Port used for app access https over infra nodes
+
+  external_network:
+    type: string
+    description: Network used by the load balancer
+    constraints:
+    - custom_constraint: neutron.network
+
+  service_subnet:
+    description: >
+      The name or ID of the internal IPv4 space
+    type: string
+    constraints:
+    - custom_constraint: neutron.subnet
+
+resources:
+# MASTERS
+  monitor_master:
+    type: OS::Neutron::LBaaS::HealthMonitor
+    properties:
+      delay: 3
+      type: HTTPS
+      timeout: 3
+      max_retries: 3
+      pool: { get_resource: pool_master }
+
+  pool_master:
+    type: OS::Neutron::LBaaS::Pool
+    properties:
+      lb_algorithm: ROUND_ROBIN
+      protocol: HTTPS
+      listener: { get_resource: listener_master }
+
+  listener_master:
+    type: OS::Neutron::LBaaS::Listener
+    properties:
+      loadbalancer: { get_resource: loadbalancer }
+      protocol: HTTPS
+      protocol_port: { get_param: lb_port_master }
+
+# HTTP INFRA
+  http_monitor_infra:
+    type: OS::Neutron::LBaaS::HealthMonitor
+    properties:
+      delay: 3
+      type: PING
+      timeout: 3
+      max_retries: 3
+      pool: { get_resource: http_pool_infra }
+
+  http_pool_infra:
+    type: OS::Neutron::LBaaS::Pool
+    properties:
+      lb_algorithm: LEAST_CONNECTIONS
+      protocol: HTTP
+      listener: { get_resource: http_listener_infra }
+
+  http_listener_infra:
+    type: OS::Neutron::LBaaS::Listener
+    properties:
+      loadbalancer: { get_resource: loadbalancer }
+      protocol: HTTP
+      protocol_port: { get_param: lb_port_infra_http }
+
+# HTTPS INFRA
+  https_monitor_infra:
+    type: OS::Neutron::LBaaS::HealthMonitor
+    properties:
+      delay: 3
+      type: PING
+      timeout: 3
+      max_retries: 3
+      pool: { get_resource: https_pool_infra }
+
+  https_pool_infra:
+    type: OS::Neutron::LBaaS::Pool
+    properties:
+      lb_algorithm: LEAST_CONNECTIONS
+      protocol: HTTPS
+      listener: { get_resource: https_listener_infra }
+
+  https_listener_infra:
+    type: OS::Neutron::LBaaS::Listener
+    properties:
+      loadbalancer: { get_resource: loadbalancer }
+      protocol: HTTPS
+      protocol_port: { get_param: lb_port_infra_https }
+
+# Load Balancer
+  loadbalancer:
+    type: OS::Neutron::LBaaS::LoadBalancer
+    properties:
+      vip_subnet: { get_param: service_subnet }
+
+  floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: { get_param: external_network }
+      port_id: { get_attr: [loadbalancer, vip_port_id ]}
+
+outputs:
+  masters_pool:
+    description: The load balancer pool
+    value: {get_resource: pool_master}
+  lburl:
+    value:
+      str_replace:
+        template: https://NAME.IP_ADDRESS.DOMAIN:PORT
+        params:
+          IP_ADDRESS: { get_attr: [ floating_ip, floating_ip_address ] }
+          PORT: { get_param: lb_port_master }
+          NAME: openshift
+          DOMAIN: xip.io
+    description: >
+      This URL is the "external" URL to access openshift
+  infras_pool_http:
+    description: The load balancer pool
+    value: {get_resource: http_pool_infra}
+  infras_pool_https:
+    description: The load balancer pool
+    value: {get_resource: https_pool_infra}
+  lb_floatingip:
+        value: {get_attr: [floating_ip, floating_ip_address]}

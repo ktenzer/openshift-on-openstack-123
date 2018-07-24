@@ -102,6 +102,10 @@ resources:
       - port: {get_resource: port}
       scheduler_hints:
         group: {get_param: server_group}
+      block_device_mapping:
+        - device_name: vda
+          volume_id: { get_resource: root_volume }
+          delete_on_termination: true
 
   port:
     type: OS::Neutron::Port
@@ -121,22 +125,23 @@ resources:
       protocol_port: { get_param: masters_app_port }
       subnet: { get_param: service_subnet }
 
-#  floating_ip:
-#    type: OS::Neutron::FloatingIP
-#    properties:
-#      floating_network: {get_param: external_network}
-#      port_id: {get_resource: port}
-
-  cinder_volume:
+  root_volume:
     type: OS::Cinder::Volume
     properties:
-      size: 2
+      size: 20
+      image: {get_param: image}
+      availability_zone: nova
+
+  docker_volume:
+    type: OS::Cinder::Volume
+    properties:
+      size: 5
       availability_zone: nova
 
   volume_attachment:
     type: OS::Cinder::VolumeAttachment
     properties:
-      volume_id: { get_resource: cinder_volume }
+      volume_id: { get_resource: docker_volume }
       instance_uuid: { get_resource: host }
       mountpoint: /dev/vdc
 

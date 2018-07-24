@@ -1,0 +1,32 @@
+- name: Validate masters
+  assert:
+    that:
+      - (master_count == 1) or (master_count == 3)
+    msg: "Master count is currently {{ master_count }} but must be 1 or 3"
+
+- name: Validate infras
+  assert:
+    that:
+      - (infra_count >= 1 ) 
+      - (infra_count <= 3)
+    msg: "Infra count s currently {{ infra_count }} but must be between 1 and 3"
+
+- name: Validate nodes
+  assert:
+    that:
+      - (node_count >= 1 ) 
+    msg: "Node count {{ node_count }} must be >= 1"
+
+- name: Validate OpenShift HA
+  assert:
+    that:
+      - (master_count == 3) and (infra_count > 1)
+    msg: "OpenShift HA requires 3 masters and at least 2 infra nodes"
+  when: openshift_ha
+
+- name: Validate Registry HA
+  assert:
+    that:
+      - (registry_replicas > 1 )
+    msg: "OpenShift HA requires at least 2 registry replicas"
+  when: openshift_ha

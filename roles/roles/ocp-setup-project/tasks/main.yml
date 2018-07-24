@@ -1,0 +1,101 @@
+- name: Set facts for free tier
+  set_fact:
+    num_pods: 4
+    cpu_requests: 1
+    cpu_limits: 2
+    mem_requests: 1Gi
+    mem_limits: 2Gi
+    pod_max_cpu: 1
+    pod_min_cpu: 100m
+    pod_max_mem: 1Gi
+    pod_min_mem: 100Mi
+    container_max_cpu: 1
+    container_min_cpu: 100m
+    container_max_mem: 1Gi
+    container_min_mem: 100Mi
+  when: tier == "free"
+
+- name: Set facts for small tier
+  set_fact:
+    num_pods: 8
+    cpu_requests: 2
+    cpu_limits: 4
+    mem_requests: 2Gi
+    mem_limits: 4Gi
+    pod_max_cpu: 2
+    pod_min_cpu: 100m
+    pod_max_mem: 2Gi
+    pod_min_mem: 100Mi
+    container_max_cpu: 2
+    container_min_cpu: 100m
+    container_max_mem: 2Gi
+    container_min_mem: 100Mi
+  when: tier == "small"
+
+- name: Set facts for medium tier
+  set_fact:
+    num_pods: 16
+    cpu_requests: 4
+    cpu_limits: 8
+    mem_requests: 4Gi
+    mem_limits: 8Gi
+    pod_max_cpu: 4
+    pod_min_cpu: 100m
+    pod_max_mem: 4Gi
+    pod_min_mem: 100Mi
+    container_max_cpu: 4
+    container_min_cpu: 100m
+    container_max_mem: 4Gi
+    container_min_mem: 100Mi
+  when: tier == "medium"
+
+- name: Set facts for large tier
+  set_fact:
+    num_pods: 32
+    cpu_requests: 8
+    cpu_limits: 16
+    mem_requests: 8Gi
+    mem_limits: 16Gi
+    pod_max_cpu: 8
+    pod_min_cpu: 100m
+    pod_max_mem: 8Gi
+    pod_min_mem: 100Mi
+    container_max_cpu: 8
+    container_min_cpu: 100m
+    container_max_mem: 8Gi
+    container_min_mem: 100Mi
+  when: tier == "large"
+
+- name: Authenticate to OpenShift via Token
+  shell: oc login {{ url }} --insecure-skip-tls-verify=true --token {{ token }}
+
+- name: Create OpenShift Project
+  shell: oc new-project {{ project }}
+  when: new_project == "True"
+
+- name: Add users and roles to project
+  shell: oc policy add-role-to-user {{ role }} {{ user }} -n {{ project }}
+
+- name: Copy Compute Quota Template to /tmp
+  template:
+    src: templates/compute-resources.j2
+    dest: /tmp/compute-resources.yml
+    mode: 0644
+
+- name: Copy Limit Range Template to /tmp
+  template:
+    src: templates/limit-ranges.j2
+    dest: /tmp/limit-ranges.yml
+    mode: 0644
+
+- name: Set Project Quota
+  shell: oc create -f /tmp/compute-resources.yml -n {{ project }}
+  when: new_project == "True"
+
+- name: Set Project Limit Ranges
+  shell: oc create -f /tmp/limit-ranges.yml -n {{ project }}
+  when: new_project == "True"
+
+- name: Label Project Namespace
+  shell: oc label namespace {{ project }} box={{ label }} -n {{ project }}
+  when: new_project == "True"
