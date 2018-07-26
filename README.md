@@ -473,3 +473,7 @@ The registry sometimes fails to complete install due to host resolution of xip.i
 ## Issue 4: Firewalld Error when installing OpenShift 3.9
 
 RHEL 7.5 introduced some changes to firewalld. After installing firewalld, you actually need to reboot your system. The OpenShift 3.9 installer does not account for this, therefore after Step 2, before running OpenShift deployment reboot all nodes and then run OpenShift deployment.
+
+## Issue 5: Adding Datasource to Grafana Fails
+
+When installing the optional Garafana, adding the Prometheus datasource sometimes fails. This is an timing issue with the current playbook trying to access a route while its still being activated and will likely be fixed in a future version. Simply re-running the playbook resolved the issue and resulted in successful installation.
