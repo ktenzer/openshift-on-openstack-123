@@ -102,6 +102,14 @@ openshift_metrics_heapster_nodeselector={"region":"infra"}
 openshift_hosted_prometheus_deploy=false
 openshift_prometheus_node_selector={"region":"infra"}
 
+# Deploy Grafana
+openshift_grafana_state=absent
+openshift_grafana_namespace=openshift-grafana
+openshift_grafana_prometheus_namespace=openshift-metrics
+openshift_grafana_node_selector={"region":"infra"}
+openshift_grafana_storage_type=pvc
+openshift_grafana_pvc_size=2Gi
+
 # OpenShift Template Service Broker
 openshift_template_service_broker_namespaces=['openshift']
 

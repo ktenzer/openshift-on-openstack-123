@@ -404,6 +404,29 @@ Initialization             : Complete (0:01:34)
 Prometheus Install            : Complete (0:04:37)
 ```
 
+Install Grafana
+Set grafana to true in inventory
+```
+[cloud-user@bastion ~]$ vi openshift_inventory
+...
+openshift_grafana_state=present
+...
+```
+Run playbook for Grafana for OpenShift 3.9
+```
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-grafana/config.yml
+PLAY RECAP *****************************************************************************************
+infra0.ocp3.lab            : ok=0    changed=0    unreachable=0    failed=0
+localhost                  : ok=11   changed=0    unreachable=0    failed=0
+master0.ocp3.lab           : ok=70   changed=11   unreachable=0    failed=0
+node0.ocp3.lab             : ok=0    changed=0    unreachable=0    failed=0
+
+INSTALLER STATUS ***********************************************************************************
+Initialization             : Complete (0:01:13)
+Grafana Install            : Complete (0:02:12)
+```
+
+
 Install Logging
 Set logging to true in inventory
 ```
@@ -450,3 +473,7 @@ The registry sometimes fails to complete install due to host resolution of xip.i
 ## Issue 4: Firewalld Error when installing OpenShift 3.9
 
 RHEL 7.5 introduced some changes to firewalld. After installing firewalld, you actually need to reboot your system. The OpenShift 3.9 installer does not account for this, therefore after Step 2, before running OpenShift deployment reboot all nodes and then run OpenShift deployment.
+
+## Issue 5: Adding Datasource to Grafana Fails
+
+When installing the optional Garafana, adding the Prometheus datasource sometimes fails. This is an timing issue with the current playbook trying to access a route while its still being activated and will likely be fixed in a future version. Simply re-running the playbook resolved the issue and resulted in successful installation.
