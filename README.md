@@ -404,6 +404,29 @@ Initialization             : Complete (0:01:34)
 Prometheus Install            : Complete (0:04:37)
 ```
 
+Install Grafana
+Set grafana to true in inventory
+```
+[cloud-user@bastion ~]$ vi openshift_inventory
+...
+openshift_grafana_state=present
+...
+```
+Run playbook for Grafana for OpenShift 3.9
+```
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-grafana/config.yml
+PLAY RECAP *****************************************************************************************
+infra0.ocp3.lab            : ok=0    changed=0    unreachable=0    failed=0
+localhost                  : ok=11   changed=0    unreachable=0    failed=0
+master0.ocp3.lab           : ok=70   changed=11   unreachable=0    failed=0
+node0.ocp3.lab             : ok=0    changed=0    unreachable=0    failed=0
+
+INSTALLER STATUS ***********************************************************************************
+Initialization             : Complete (0:01:13)
+Grafana Install            : Complete (0:02:12)
+```
+
+
 Install Logging
 Set logging to true in inventory
 ```
