@@ -19,22 +19,18 @@ In addition I would like to metion I borrowed a lot of ideas from two other proj
 * Working OpenStack deployment. Tested is OpenStack 12 & 13 (Pike & Queens) using RDO.
 * RHEL 7 image. Tested is RHEL 7.4.
 * An openstack ssh key for accessing instances.
-* A pre-configured provider (public) network with at least three available floating ips.
+* A provider (public) network with at least two or three available floating ips.
+* A service (internal) network
+* A router configured with the public network as gateway and internal network as interface.
 * Flavors configured for OpenShift. These are only recommendations.
   * ocp.master  (2 vCPU, 4GB RAM, 30 GB Root Disk)
   * ocp.infra   (4 vCPU, 16GB RAM, 30 GB Root Disk)
   * ocp.node    (2 vCPU, 4GB RAM, 30 GB Root Disk)
   * ocp.bastion (1 vCPU, 4GB RAM, 30 GB Root Disk)
-* A router that has the provider network configured as a gateway.
 * Properly configured cinder and nova storage.
   * Make sure you aren't using default loop back and have disabled disk zeroing in cinder/nova for LVM.
 
-Increase at least volumes and secgroups in default project quota
-```
-# openstack quota set --volumes 1000 --secgroup-rules 100 <Project Name>
-```
-
-More information on setting up proper OpenStack environment can be found [here](https://keithtenzer.com/2018/02/05/openstack-12-pike-lab-installation-and-configuration-guide-with-hetzner-root-servers/).
+More information on setting up proper OpenStack environment can be found [here](https://keithtenzer.com/2018/07/17/openstack-13-queens-lab-installation-and-configuration-guide-for-hetzner-root-servers/).
 
 # Tested Deployments
 ```Single Master - Non HA```
@@ -46,6 +42,93 @@ Single Master deployment is 1 Master, 1 Infra node and X number of App nodes. Th
 
 Multiple Master deployment is 3 Master, 2 Infra node and X number of App nodes. This configuration is an HA setup. By default etcd and registry are not using persistent storage. This would need to be configured post-install manually at this time if those should be persisted.
 ![](images/openshift_on_openstack_ha.PNG)
+
+# OpenStack Pre-Configuration (if required)
+
+## Setup External Network
+You need an external floating ip network, and internal network and a router using the external network as gateway and internal network interface. In this case we will create the public network and router in the admin project and the internal network in a new project.
+
+Authenticate to admin project
+
+```
+# source /root/keystonerc_admin
+```
+
+Create public network
+
+```
+# openstack network create --provider-network-type flat \
+--provider-physical-network extnet2 --external public
+```
+
+Create public subnet
+
+```
+# openstack subnet create --network public --allocation-pool \
+start=144.76.132.226,end=144.76.132.230 --no-dhcp \
+--subnet-range 144.76.132.224/29 public_subnet
+```
+
+Create router
+
+```
+# openstack router create --no-ha router1
+
+```
+
+Set public network as gateway in router
+
+```
+# openstack router set --external-gateway public router1
+```
+
+## Setup New OpenStack Project
+
+Create Project
+
+```
+# openstack project create test
+```
+
+Add admin user as admin to project
+
+```
+# openstack role add --project test --user admin admin
+```` 
+
+Increase project quota for security groups
+
+```
+# openstack quota set --secgroups 100 test
+```
+
+Increase quota for volumes
+
+```
+#  openstack quota set --volumes 100 test
+```
+
+## Setup Internal Network
+
+Create internal network
+
+```
+# openstack network create test
+```
+
+Create internal subnet
+
+```
+# openstack subnet create --network test --allocation-pool \
+start=192.168.4.100,end=192.168.4.200 --dns-nameserver 213.133.98.98 \
+--subnet-range 192.168.4.0/24 test_subnet
+```
+
+Add internal network to router as interface
+
+```
+# openstack router add subnet router1 test_subnet
+```
 
 # Install
 ![](images/one.png)

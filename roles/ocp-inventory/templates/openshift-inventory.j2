@@ -37,6 +37,7 @@ openshift_cloudprovider_openstack_domain_name=Default
 openshift_cloudprovider_openstack_tenant_name={{ openstack_project }}
 openshift_cloudprovider_openstack_region=RegionOne
 openshift_cloudprovider_openstack_blockstorage_version=v2
+openshift_cloudprovider_openstack_lb_subnet_id={{ service_subnet_id }}
 
 # Enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]

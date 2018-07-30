@@ -14,19 +14,19 @@ parameters:
     constraints:
     - custom_constraint: neutron.network
 
-  service_subnet_cidr:
-    type: string
+  service_network:
     description: >
-      The subnet used for instance to instance communication
-    default: 10.0.1.0/24
-
-  dns_forwarders:
-    type: comma_delimited_list
-    description: Addresses of a dns nameserver reachable in your environment
-
-  router_id:
+      The name or ID of the internal network
     type: string
-    description: The existing router id
+    constraints:
+    - custom_constraint: neutron.network
+
+  service_subnet:
+    description: >
+      The name or ID of the internal IPv4 space
+    type: string
+    constraints:
+    - custom_constraint: neutron.subnet
 
   bastion_hostname:
     description: >
@@ -159,35 +159,24 @@ parameters:
 
 resources:
 
-  network:
-    type: network.yaml
-    properties:
-      external_network: {get_param: external_network}
-      service_subnet_cidr: {get_param:  service_subnet_cidr}
-      dns_nameservers: {get_param: dns_forwarders}
-      router_id: {get_param: router_id}
-
   lbaas_masters:
-    depends_on: [network]
     type: lbaas_masters.yaml
     properties:
       external_network: {get_param: external_network}
-      service_subnet: {get_attr: [network, openshift_subnet]}
+      service_subnet: {get_param: service_subnet}
     
   lbaas_infras:
-    depends_on: [network]
     type: lbaas_infras.yaml
     properties:
       external_network: {get_param: external_network}
-      service_subnet: {get_attr: [network, openshift_subnet]}
+      service_subnet: {get_param: service_subnet}
 
   hosts:
-    depends_on: [network]
     type: hosts.yaml
     properties:
       external_network: {get_param: external_network}
-      service_network: {get_attr: [network, openshift_network]}
-      service_subnet: {get_attr: [network, openshift_subnet]}
+      service_network: {get_param: service_network}
+      service_subnet: {get_param: service_subnet}
       masters_pool: {get_attr: [lbaas_masters, masters_pool]}
       infras_pool_http: {get_attr: [lbaas_infras, infras_pool_http]}
       infras_pool_https: {get_attr: [lbaas_infras, infras_pool_https]}

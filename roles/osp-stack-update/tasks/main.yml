@@ -11,8 +11,8 @@
     parameters:
       domain_name: "{{ domain_name }}"
       external_network: "{{ external_network }}"
-      service_subnet_cidr: "{{ service_subnet_cidr }}"
-      router_id: "{{ router_id }}"
+      service_network: "{{ service_network }}"
+      service_subnet: "{{ service_subnet_id }}"
       ssh_key_name: "{{ ssh_key_name }}"
       dns_forwarders: "{{ dns_forwarders }}"
       image: "{{ image }}"

@@ -5,10 +5,9 @@ openstack_passwd: <password>
 openstack_ip: <ip address>
 openstack_project: <project>
 domain_name: ocp3.lab
-dns_forwarders: [213.133.98.98, 213.133.98.99]
 external_network: public
-service_subnet_cidr: 192.168.1.0/24
-router_id: <router id from 'openstack router list'>
+service_network: mgmt
+service_subnet_id: 718f3675-55b9-498a-8c7b-e4eb2e41dde4
 image: rhel74
 ssh_user: cloud-user
 ssh_key_path: /root/admin.pem
