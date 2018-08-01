@@ -78,3 +78,27 @@
         name: atomic-openshift-node
         state: restarted
       when: openshift_version == 3.7
+
+- name: Open firewall for node-exporter
+  hosts: masters,infras,nodes
+  become: true
+
+  task:
+    - name: Open port 9100/tcp
+      firewalld:
+        port: 9100/tcp
+        state: enabled
+        immediate: true
+        permanent: true
+
+- name: Open firewall for router statistics
+  hosts: infras
+  become: true
+
+  task:
+    - name: Open port 1936/tcp
+      firewalld:
+        port: 1936/tcp
+        state: enabled
+        immediate: true
+        permanent: true
