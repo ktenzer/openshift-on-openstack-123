@@ -266,6 +266,11 @@ resources:
         protocol: udp
         port_range_min: 4789
         port_range_max: 4789
+      # Node exporter
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 9100
+        port_range_max: 9100
       - direction: ingress
         protocol: tcp
         port_range_min: 53
@@ -274,7 +279,6 @@ resources:
         protocol: udp
         port_range_min: 53
         port_range_max: 53
-      # NFS Ports
       - direction: ingress
         protocol: tcp
         port_range_min: 111
@@ -363,6 +367,10 @@ resources:
         port_range_max: 8053
       - direction: ingress
         protocol: tcp
+        port_range_min: 9100
+        port_range_max: 9100
+      - direction: ingress
+        protocol: tcp
         port_range_min: 10250
         port_range_max: 10250
       - direction: ingress
@@ -414,9 +422,12 @@ resources:
         port_range_max: 4789
       - direction: ingress
         protocol: tcp
+        port_range_min: 9100
+        port_range_max: 9100
+      - direction: ingress
+        protocol: tcp
         port_range_min: 5000
         port_range_max: 5000
-      - protocol: 112
 
 
 outputs:
