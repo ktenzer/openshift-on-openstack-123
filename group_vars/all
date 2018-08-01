@@ -11,8 +11,7 @@ packages:
   - psacct
   - yum-utils
 packages_bastion_openshift:
-  - atomic-openshift-utils
-  - atomic-openshift-clients
+  - openshift-ansible
 packages_bastion_openstack:
   - python-openstackclient
   - python-heatclient
