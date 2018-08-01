@@ -9,6 +9,7 @@ packages:
   - kexec-tools
   - sos
   - psacct
+  - yum-utils
 packages_bastion_openshift:
   - atomic-openshift-utils
   - atomic-openshift-clients

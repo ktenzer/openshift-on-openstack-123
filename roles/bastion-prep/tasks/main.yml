@@ -44,18 +44,12 @@
   delay: 5
   with_items: "{{repos_bastion}}"
 
-- name: Ensure that required packages are present on target hosts
+- name: Ensure that required packages are installed on target hosts
   yum:
     name: "{{item}}"
     state: latest
   retries: 5
   delay: 5
-  with_items: "{{packages}}"
-
-- name: Install Required Packages
-  yum:
-    name: "{{item}}"
-    state: installed
   with_items: "{{packages}}"
 
 - name: Install required openstack packages for bastion

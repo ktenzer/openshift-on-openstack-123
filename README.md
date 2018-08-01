@@ -386,7 +386,7 @@ Web Console Install        : Complete (0:02:00)
 Service Catalog Install    : Complete (0:04:39)
 ```
 
-Run post install playbook
+Run post install playbook (only needed prior to 3.10, ignore for 3.10 and higher)
 ```
 [cloud-user@bastion ~]$ ansible-playbook post-openshift.yml --private-key=/home/cloud-user/admin.pem -e @vars.yml
 
@@ -450,7 +450,7 @@ Initialization             : Complete
 Metrics Install            : Complete
 ```
 
-Run playbook for metrics for OpenShift 3.9
+Run playbook for metrics for OpenShift 3.9 and higher
 ```
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-metrics/config.yml
 PLAY RECAP *****************************************************************************************
@@ -473,7 +473,7 @@ Set prometheus to true in inventory
 openshift_hosted_prometheus_deploy=true
 ...
 ```
-Run playbook for prometheus for OpenShift 3.9
+Run playbook for prometheus for OpenShift 3.9 and higher
 ```
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-prometheus/config.yml
 PLAY RECAP *****************************************************************************************
@@ -495,7 +495,7 @@ Set grafana to true in inventory
 openshift_grafana_state=present
 ...
 ```
-Run playbook for Grafana for OpenShift 3.9
+Run playbook for Grafana for OpenShift 3.9 and higher
 ```
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-grafana/config.yml
 PLAY RECAP *****************************************************************************************
@@ -524,7 +524,7 @@ Run playbook for logging OpenShift 3.7
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-logging.yml
 ```
 
-Run Playbook for logging OpenShift 3.9
+Run Playbook for logging OpenShift 3.9 and higher
 ```
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-logging/config.yml
 ```

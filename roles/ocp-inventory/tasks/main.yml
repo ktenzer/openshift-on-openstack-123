@@ -20,18 +20,18 @@
 
 - name: Configure master nodes dynamically
   lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
-    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} openshift_schedulable=True"
+    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_group_name='node-config-master'"
     insertafter="^#?\[nodes\]"
   with_items: "{{ groups['masters'] }}"
 
 - name: Configure infra nodes dynamically
   lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
-    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_labels=\"{'region'{{ ":" }} 'infra', 'zone'{{ ":" }} 'test', 'fluentd'{{ ":" }} 'true'}\""
+    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_group_name='node-config-infra'"
     insertafter="^#?{{ master_regex }}"
   with_items: "{{ groups['infras'] }}"
 
 - name: Configure app nodes dynamically
   lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
-    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_labels=\"{'region'{{ ":" }} 'primary', 'zone'{{ ":" }} 'test', 'fluentd'{{ ":" }} 'true'}\""
+    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_group_name='node-config-compute'"
     insertafter="^#?{{ infra_regex }}"
   with_items: "{{ groups['nodes'] }}"
