@@ -343,6 +343,10 @@ resources:
         port_range_max: 8443
       - direction: ingress
         protocol: tcp
+        port_range_min: 8444
+        port_range_max: 8444
+      - direction: ingress
+        protocol: tcp
         port_range_min: 443
         port_range_max: 443
       - direction: ingress
@@ -420,6 +424,10 @@ resources:
         protocol: udp
         port_range_min: 4789
         port_range_max: 4789
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 1936
+        port_range_max: 1936
       - direction: ingress
         protocol: tcp
         port_range_min: 9100
