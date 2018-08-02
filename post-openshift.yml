@@ -83,7 +83,7 @@
   hosts: masters,infras,nodes
   become: true
 
-  task:
+  tasks:
     - name: Open port 9100/tcp
       firewalld:
         port: 9100/tcp
@@ -95,7 +95,7 @@
   hosts: infras
   become: true
 
-  task:
+  tasks:
     - name: Open port 1936/tcp
       firewalld:
         port: 1936/tcp
