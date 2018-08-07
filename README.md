@@ -163,22 +163,21 @@ openstack_passwd: <password>
 openstack_ip: <ip address>
 openstack_project: <project>
 domain_name: ocp3.lab
-dns_forwarders: [213.133.98.98, 213.133.98.99]
 external_network: public
-service_subnet_cidr: 192.168.1.0/24
-router_id: <router id from 'openstack router list'>
+service_network: <network name for internal network>
+service_subnet_id: <subnet id for internal subnet>
 image: rhel74
 ssh_user: cloud-user
 ssh_key_path: /root/admin.pem
 ssh_key_name: admin
 stack_name: openshift
-openstack_version: 13
+openstack_version: "13"
 contact: admin@ocp3.lab
 heat_template_path: /root/openshift-on-openstack-123/heat/openshift.yaml
 
 ### OpenShift Settings ###
-openshift_version: 3.9
-docker_version: 1.13.1
+openshift_version: "3.9"
+docker_version: "1.13.1"
 openshift_ha: true
 registry_replicas: 2
 openshift_user: admin
@@ -196,9 +195,9 @@ node_count: 2
 
 ### OpenStack Instance Group Policies ###
 ### Set to 'affinity' if only one compute node ###
-master_server_group_policies: "['anti-affinity']"
-infra_server_group_policies: "['anti-affinity']"
-node_server_group_policies: "['anti-affinity']"
+master_server_group_policies: "['affinity']"
+infra_server_group_policies: "['affinity']"
+node_server_group_policies: "['affinity']"
 
 ### OpenStack Instance Flavors ###
 bastion_flavor: ocp.bastion
