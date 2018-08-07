@@ -135,19 +135,24 @@ Add internal network to router as interface
 
 ```[OpenStack Controller]```
 
+Install Git & Ansible
+```
+# yum install -y git ansible
+```
+
 Clone Git Repository
 ```
 # git clone https://github.com/ktenzer/openshift-on-openstack-123.git
 ```
 
-Checkout release branch 3.9
-```
-# git checkout release-3.9
-```
-
 Change dir to repository
 ```
 # cd openshift-on-openstack-123
+```
+
+Checkout release branch 3.9
+```
+# git checkout release-3.9
 ```
 
 Configure Parameters
