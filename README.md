@@ -199,7 +199,7 @@ infra_count: 2
 node_count: 2
 
 ### OpenStack Instance Group Policies ###
-### Set to 'affinity' if only one compute node ###
+### Set to 'affinity' if running on multiple compute nodes ###
 master_server_group_policies: "['affinity']"
 infra_server_group_policies: "['affinity']"
 node_server_group_policies: "['affinity']"

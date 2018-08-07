@@ -36,10 +36,10 @@ infra_count: 2
 node_count: 2
 
 ### OpenStack Instance Group Policies ###
-### Set to 'affinity' if only one compute node ###
-master_server_group_policies: "['anti-affinity']"
-infra_server_group_policies: "['anti-affinity']"
-node_server_group_policies: "['anti-affinity']"
+### Set to 'anti-affinity' if running on multiple compute node ###
+master_server_group_policies: "['affinity']"
+infra_server_group_policies: "['affinity']"
+node_server_group_policies: "['affinity']"
 
 ### OpenStack Instance Flavors ###
 bastion_flavor: ocp.bastion
