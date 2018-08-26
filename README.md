@@ -135,19 +135,24 @@ Add internal network to router as interface
 
 ```[OpenStack Controller]```
 
+Install Git & Ansible
+```
+# yum install -y git ansible
+```
+
 Clone Git Repository
 ```
 # git clone https://github.com/ktenzer/openshift-on-openstack-123.git
 ```
 
-Checkout release branch 3.9
-```
-# git checkout release-3.9
-```
-
 Change dir to repository
 ```
 # cd openshift-on-openstack-123
+```
+
+Checkout release branch 3.9
+```
+# git checkout release-3.9
 ```
 
 Configure Parameters
@@ -194,7 +199,7 @@ infra_count: 2
 node_count: 2
 
 ### OpenStack Instance Group Policies ###
-### Set to 'affinity' if only one compute node ###
+### Set to 'affinity' if running on multiple compute nodes ###
 master_server_group_policies: "['affinity']"
 infra_server_group_policies: "['affinity']"
 node_server_group_policies: "['affinity']"
