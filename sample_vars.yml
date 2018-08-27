@@ -2,7 +2,7 @@
 ### OpenStack Setting ###
 openstack_user: admin
 openstack_passwd: <password>
-openstack_ip: <ip address>
+openstack_auth_url: <openstack auth url>
 openstack_project: <project>
 domain_name: ocp3.lab
 external_network: public
