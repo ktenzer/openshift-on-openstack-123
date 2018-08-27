@@ -1,0 +1,138 @@
+---
+heat_template_version: 2016-10-14
+
+description:
+  An instance for a OpenShift master
+  The instances are created with Heat and then configured with Ansible
+
+parameters:
+  masters_pool:
+    type: string
+    description: The masters lbaas pool
+
+  masters_app_port:
+    type: number
+    default: 8443
+    description: Port used by the servers
+
+  master_count:
+    type: number
+    description: >
+      Number of slave servers to create.
+    default: 1
+
+  hostname_prefix:
+    description: >
+      The default prefix for slave server hostnames
+    type: string
+    default: "master"
+
+  domain_name:
+    description: >
+      All VMs will be placed in this domain
+    type: string
+
+  # Connectivity
+  external_network:
+    type: string
+    description: >
+      The external network that provides floating IP addresses for the masters
+    constraints:
+    - custom_constraint: neutron.network
+
+  service_network:
+    description: >
+      The name or ID of the internal network
+    type: string
+    constraints:
+    - custom_constraint: neutron.network
+
+  service_subnet:
+    description: >
+      The name or ID of the internal IPv4 space
+    type: string
+    constraints:
+    - custom_constraint: neutron.subnet
+
+  security_group:
+    description: >
+      Allow OpenShift service access to instances
+    type: string
+    constraints:
+    - custom_constraint: neutron.security_group
+
+  master_server_group_policies:
+    type: comma_delimited_list
+    description: >
+      List of policies applied on master nodes ServerGroup. By default
+      'anti-affinity' policy is used to make sure that each master node
+      is deployed on a different host. If you use a small/all-in-one openstack
+      environment, you may need to disable this e.g. by passing
+      '-P master_server_group_policies=affinity'.
+    default: ['anti-affinity']
+
+  image:
+    description: >
+      The Glance image to use as a base for OpenShift servers
+    type: string
+    constraints:
+    - custom_constraint: glance.image
+
+  master_flavor:
+    description: >
+      The name of the OpenStack instance flavor to use for OpenShift servers
+    type: string
+    default: m1.medium
+    constraints:
+    - custom_constraint: nova.flavor
+
+  # Access to the VMs
+  ssh_user:
+    type: string
+    description: >
+      The SSH user available on all nodes.
+    default: cloud-user
+
+  ssh_key_name:
+    type: string
+    description: Name of the SSH keypair registered with Nova
+    constraints:
+    - custom_constraint: nova.keypair
+
+resources:
+
+  masters:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: {get_param: master_count}
+      resource_def:
+        type: master_octavia.yaml
+        properties:
+          masters_pool: {get_param: masters_pool}
+          masters_app_port: {get_param: masters_app_port}
+          image: {get_param: image}
+          flavor: {get_param: master_flavor}
+          external_network: {get_param: external_network}
+          service_network: {get_param: service_network}
+          service_subnet: {get_param: service_subnet}
+          security_group: {get_param: security_group}
+          hostname:
+            str_replace:
+              template: "%prefix%%index%"
+              params:
+                '%prefix%': {get_param: hostname_prefix}
+          domain_name: {get_param: domain_name}
+          ssh_user: {get_param: ssh_user}
+          ssh_key_name: {get_param: ssh_key_name}
+          server_group: {get_resource: master_server_group}
+
+  master_server_group:
+    type: OS::Nova::ServerGroup
+    properties:
+      name: master_server_group
+      policies: {get_param: master_server_group_policies}
+
+
+outputs:
+  entries:
+    value: {get_attr: [masters, entry]}

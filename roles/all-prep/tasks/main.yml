@@ -19,7 +19,7 @@
     password: "{{ rhn_password_or_activation_key }}"
     pool: "{{ rhn_pool }}"
     #force_register: yes
-  register: subscribe_user
+  register: subscribe
   retries: 5
   delay: 5
   when: subscription_use_username == True and subs_result.changed
@@ -31,7 +31,7 @@
     activationkey: "{{ rhn_password_or_activation_key }}"
     pool: "{{ rhn_pool }}"
     #force_register: yes
-  register: subscribe_activation_key
+  register: subscribe
   retries: 5
   delay: 5
   when: subscription_use_username == False and subs_result.changed
@@ -40,18 +40,18 @@
     msg: "username subscription {{ subscribe_user.changed }}"
 
 - debug:
-    msg: "activation key subscription {{ subscribe_activation_key.changed }}"
+    msg: "username subscription {{ subscribe_activation_key.changed }}"
 
 - name: Disable all repos
   shell: |
     subscription-manager repos --disable=*
   retries: 5
   delay: 5
-  when: subscribe.changed
+  when: subscribe_user.changed or subscribe_activation_key.changed
 
 - name: Enable correct repos
   command: "subscription-manager repos --enable={{item}}"
-  when: subscribe.changed
+  when: subscribe_user.changed or subscribe_activation_key.changed
   retries: 5
   delay: 5
   with_items: "{{repos}}"

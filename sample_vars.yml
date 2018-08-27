@@ -27,7 +27,7 @@ openshift_passwd: <password>
 
 ### Red Hat Subscription ###
 subscription_use_username: True
-rhn_username_or_ord_id: <user or org id>
+rhn_username_or_org_id: <user or org id>
 rhn_password_or_activation_key: <password or activation key>
 rhn_pool: <pool>
 
