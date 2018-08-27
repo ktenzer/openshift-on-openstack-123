@@ -30,7 +30,7 @@ openshift_override_hostname_check=true
 
 # Openstack
 openshift_cloudprovider_kind=openstack
-openshift_cloudprovider_openstack_auth_url=http://{{ openstack_ip }}:5000/v3
+openshift_cloudprovider_openstack_auth_url={{ openstack_auth_url }}
 openshift_cloudprovider_openstack_username={{ openstack_user }}
 openshift_cloudprovider_openstack_password='"{{ openstack_passwd }}"'
 openshift_cloudprovider_openstack_domain_name=Default
