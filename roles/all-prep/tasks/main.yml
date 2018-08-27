@@ -19,7 +19,7 @@
     password: "{{ rhn_password_or_activation_key }}"
     pool: "{{ rhn_pool }}"
     #force_register: yes
-  register: subscribe
+  register: subscribe_user
   retries: 5
   delay: 5
   when: subscription_use_username == True and subs_result.changed
@@ -31,7 +31,7 @@
     activationkey: "{{ rhn_password_or_activation_key }}"
     pool: "{{ rhn_pool }}"
     #force_register: yes
-  register: subscribe
+  register: subscribe_activation_key
   retries: 5
   delay: 5
   when: subscription_use_username == False and subs_result.changed
