@@ -14,7 +14,6 @@
       service_network: "{{ service_network }}"
       service_subnet: "{{ service_subnet_id }}"
       ssh_key_name: "{{ ssh_key_name }}"
-      dns_forwarders: "{{ dns_forwarders }}"
       image: "{{ image }}"
       bastion_flavor: "{{ bastion_flavor }}"
       master_flavor: "{{ master_flavor }}"
@@ -32,21 +31,21 @@
 
 - name: Register stack output
   command: >
-    openstack stack output show -f value -c output_value
+    openstack stack output show -f json -c output_value
     {{ stack_name }} ip_address
   register: stack_output_raw
 
 - set_fact:
-    stack_output: "{{ stack_output_raw.stdout|from_json }}"
+    #stack_output: "{{ stack_output_raw.stdout|from_json }}"
+    stack_output: "{{ stack_output_raw }}"
 
-#- name: Add the bastion to the inventory
-#  add_host:
-#    name: "{{ stack_output.bastion.address }}"
-#    groups: bastion
-#    zone: "{{ domain_name }}"
-#    domain_name: "{{ domain_name }}"
-#    contact: "{{ contact }}"
-#    ansible_user: "{{ ssh_user }}"
+#- name: Update openshift subnet in inventory file
+#  lineinfile:
+#    path: /etc/selinux/config
+#    regexp: '^openshift_cloudprovider_openstack_lb_subnet_id='
+#    line: 'openshift_cloudprovider_openstack_lb_subnet_id={{ osp_subnet_id }}'
+#  vars:
+#    ansible_connection: local
 
 - name: Wait 300 seconds for port 22 to become open and contain "OpenSSH"
   wait_for:
@@ -56,3 +55,4 @@
     delay: 10
   vars:
     ansible_connection: local
+
