@@ -16,3 +16,15 @@
   tasks:
   - import_role:
       name: osp-stack-update
+  - import_role:
+      name: osp-inventory
+
+- name: Configure OpenStack Client on Bastion
+  hosts: bastion
+  become: true
+
+  tasks:
+  - import_role:
+      name: bastion-prep
+
+

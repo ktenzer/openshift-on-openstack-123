@@ -175,7 +175,7 @@ resources:
         hostname: {get_param: hostname}
         fqdn:
           str_replace:
-            template: "HOSTNAME.DOMAIN"
+            template: "HOSTNAME"
             params:
               HOSTNAME: {get_param: hostname}
               DOMAIN: {get_param: domain_name}

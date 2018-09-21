@@ -8,30 +8,30 @@
 
 - name: Configure masters dynamically
   lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
-    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} server_type=\"master\""
+    line="{{ item }} openshift_hostname={{ item }} server_type=\"master\""
     insertafter="^#?\[masters\]"
   with_items: "{{ groups['masters'] }}"
 
 - name: Configure etcd nodes dynamically
   lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
-    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} server_type=\"etcd\""
+    line="{{ item }} openshift_hostname={{ item }} server_type=\"etcd\""
     insertafter="^#?\[etcd\]"
   with_items: "{{ groups['masters'] }}"
 
 - name: Configure master nodes dynamically
   lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
-    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_group_name='node-config-master'"
+    line="{{ item }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_group_name='node-config-master'"
     insertafter="^#?\[nodes\]"
   with_items: "{{ groups['masters'] }}"
 
 - name: Configure infra nodes dynamically
   lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
-    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_group_name='node-config-infra'"
+    line="{{ item }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_group_name='node-config-infra'"
     insertafter="^#?{{ master_regex }}"
   with_items: "{{ groups['infras'] }}"
 
 - name: Configure app nodes dynamically
   lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
-    line="{{ item }}.{{ domain_name }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_group_name='node-config-compute'"
+    line="{{ item }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_group_name='node-config-compute'"
     insertafter="^#?{{ infra_regex }}"
   with_items: "{{ groups['nodes'] }}"
