@@ -10,6 +10,7 @@ For each release of OpenShift a release branch will be created. Starting with Op
 
 * release-1.0 OpenShift 3.7 and earlier
 * release-3.9 OpenShift 3.9
+* release-3.10 OpenShift 3.10
 
 In addition I would like to metion I borrowed a lot of ideas from two other projects.
 * [OpenShift setup for Hetzner from RH SSA team](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp)
@@ -150,9 +151,9 @@ Change dir to repository
 # cd openshift-on-openstack-123
 ```
 
-Checkout release branch 3.9
+Checkout release branch 3.10
 ```
-# git checkout release-3.9
+# git checkout release-3.10
 ```
 
 Configure Parameters
@@ -181,7 +182,7 @@ contact: admin@ocp3.lab
 heat_template_path: /root/openshift-on-openstack-123/heat/openshift.yaml
 
 ### OpenShift Settings ###
-openshift_version: "3.9"
+openshift_version: "3.10"
 docker_version: "1.13.1"
 openshift_ha: true
 registry_replicas: 2
@@ -361,11 +362,6 @@ node0.ocp3.lab             : ok=61   changed=15   unreachable=0    failed=0
 
 INSTALLER STATUS ***********************************************************************************
 Initialization             : Complete (0:04:16)
-```
-
-Reboot all nodes (masters, infras, nodes and bastion), see Issue 4 below.
-```
-[cloud-user@bastion ~]$ systemctl reboot
 ```
 
 ```
@@ -564,3 +560,7 @@ RHEL 7.5 introduced some changes to firewalld. After installing firewalld, you a
 ## Issue 5: Adding Datasource to Grafana Fails
 
 When installing the optional Garafana, adding the Prometheus datasource sometimes fails. This is an timing issue with the current playbook trying to access a route while its still being activated and will likely be fixed in a future version. Simply re-running the playbook resolved the issue and resulted in successful installation.
+
+## Issue 6: FQDNs cause OCP 3.10 install to fail
+
+Using FQDNs for masters, nodes or infras breaks OCP 3.10. Use short hostname only. Also ensure inventory file also only uses short hostname
