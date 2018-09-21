@@ -423,6 +423,11 @@ Make user OpenShift Cluster Administrator
 [cloud-user@master0 ~]$ oc adm policy add-cluster-role-to-user cluster-admin admin
 ```
 
+Label infra nodes
+```
+[cloud-user@master0 ~]$ oc label node infra0 region=infra
+```
+
 Install Metrics
 Set metrics to true in inventory
 ```
