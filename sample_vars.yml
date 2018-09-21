@@ -15,13 +15,13 @@ ssh_key_name: admin
 stack_name: openshift
 openstack_version: "13"
 contact: admin@ocp3.lab
-heat_template_path: /root/openshift-on-openstack-123/heat/openshift.yaml
+heat_template_path: /root/openshift-on-openstack-123/heat/openshift_single_lbaas.yaml
 
 ### OpenShift Settings ###
 openshift_version: "3.10"
 docker_version: "1.13.1"
-openshift_ha: true
-registry_replicas: 2
+openshift_ha: false
+registry_replicas: 1
 openshift_user: admin
 openshift_passwd: <password>
 
@@ -32,15 +32,15 @@ rhn_password_or_activation_key: <password or activation key>
 rhn_pool: <pool>
 
 ### OpenStack Instance Count ###
-master_count: 3
-infra_count: 2
-node_count: 2
+master_count: 1
+infra_count: 1
+node_count: 3
 
 ### OpenStack Instance Group Policies ###
 ### Set to 'anti-affinity' if running on multiple compute node ###
-master_server_group_policies: "['affinity']"
-infra_server_group_policies: "['affinity']"
-node_server_group_policies: "['affinity']"
+master_server_group_policies: "['soft-anti-affinity']"
+infra_server_group_policies: "['soft-anti-affinity']"
+node_server_group_policies: "['soft-anti-affinity']"
 
 ### OpenStack Instance Flavors ###
 bastion_flavor: ocp.bastion

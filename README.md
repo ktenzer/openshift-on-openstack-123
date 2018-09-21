@@ -166,12 +166,12 @@ Configure Parameters
 ### OpenStack Setting ###
 openstack_user: admin
 openstack_passwd: <password>
-openstack_ip: <ip address>
+openstack_auth_url: <openstack auth url>
 openstack_project: <project>
 domain_name: ocp3.lab
 external_network: public
-service_network: <network name for internal network>
-service_subnet_id: <subnet id for internal subnet>
+service_network: mgmt
+service_subnet_id: 718f3675-55b9-498a-8c7b-e4eb2e41dde4
 image: rhel74
 ssh_user: cloud-user
 ssh_key_path: /root/admin.pem
@@ -179,31 +179,32 @@ ssh_key_name: admin
 stack_name: openshift
 openstack_version: "13"
 contact: admin@ocp3.lab
-heat_template_path: /root/openshift-on-openstack-123/heat/openshift.yaml
+heat_template_path: /root/openshift-on-openstack-123/heat/openshift_single_lbaas.yaml
 
 ### OpenShift Settings ###
 openshift_version: "3.10"
 docker_version: "1.13.1"
-openshift_ha: true
-registry_replicas: 2
+openshift_ha: false
+registry_replicas: 1
 openshift_user: admin
 openshift_passwd: <password>
 
 ### Red Hat Subscription ###
-rhn_username: <user>
-rhn_password: <password>
+subscription_use_username: True
+rhn_username_or_org_id: <user or org id>
+rhn_password_or_activation_key: <password or activation key>
 rhn_pool: <pool>
 
 ### OpenStack Instance Count ###
-master_count: 3
-infra_count: 2
-node_count: 2
+master_count: 1
+infra_count: 1
+node_count: 3
 
 ### OpenStack Instance Group Policies ###
-### Set to 'affinity' if running on multiple compute nodes ###
-master_server_group_policies: "['affinity']"
-infra_server_group_policies: "['affinity']"
-node_server_group_policies: "['affinity']"
+### Set to 'anti-affinity' if running on multiple compute node ###
+master_server_group_policies: "['soft-anti-affinity']"
+infra_server_group_policies: "['soft-anti-affinity']"
+node_server_group_policies: "['soft-anti-affinity']"
 
 ### OpenStack Instance Flavors ###
 bastion_flavor: ocp.bastion
