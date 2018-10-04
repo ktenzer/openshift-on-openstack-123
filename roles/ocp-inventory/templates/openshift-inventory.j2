@@ -11,7 +11,7 @@ ansible_ssh_user={{ ssh_user }}
 ansible_become=yes
 
 # OpenShift Deployment, enterprise of course!
-openshift_deployment_type=openshift-enterprise
+openshift_deployment_type={{ openshift_deployment }}
 containerized=false
 os_firewall_use_firewalld=true
 openshift_clock_enabled=true

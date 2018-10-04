@@ -1,0 +1,49 @@
+- name: check if host already registered
+  command: subscription-manager list --available --match-installed --matches=*Openshift* --pool-only
+  register: subs_result
+  failed_when: false
+  changed_when: "'This system is not yet registered' in subs_result.stderr"
+
+- name: Subscribe to Red Hat subscription using username
+  redhat_subscription:
+    state: present
+    username: "{{ rhn_username_or_org_id }}"
+    password: "{{ rhn_password_or_activation_key }}"
+    pool: "{{ rhn_pool }}"
+    #force_register: yes
+  register: subscribe_user
+  retries: 5
+  delay: 5
+  when: subscription_use_username == True and subs_result.changed
+
+- name: Subscribe to Red Hat using activation key
+  redhat_subscription:
+    state: present
+    org_id: "{{ rhn_username_or_org_id }}"
+    activationkey: "{{ rhn_password_or_activation_key }}"
+    pool: "{{ rhn_pool }}"
+    #force_register: yes
+  register: subscribe_activation_key
+  retries: 5
+  delay: 5
+  when: subscription_use_username == False and subs_result.changed
+
+- debug:
+    msg: "username subscription {{ subscribe_user.changed }}"
+
+- debug:
+    msg: "username subscription {{ subscribe_activation_key.changed }}"
+
+- name: Disable all repos
+  shell: |
+    subscription-manager repos --disable=*
+  retries: 5
+  delay: 5
+  when: subscribe_user.changed or subscribe_activation_key.changed
+
+- name: Enable correct repos
+  command: "subscription-manager repos --enable={{item}}"
+  when: subscribe_user.changed or subscribe_activation_key.changed
+  retries: 5
+  delay: 5
+  with_items: "{{repos}}"

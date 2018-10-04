@@ -12,6 +12,12 @@ packages:
   - yum-utils
 packages_bastion_openshift:
   - openshift-ansible
+packages_bastion_origin:
+  - ansible
+  - pyOpenSSL
+origin_repos_bastion:
+  - https://repos.fedorapeople.org/repos/openstack/openstack-{{ openstack_release }}/rdo-release-{{ openstack_release }}-1.noarch.rpm
+  - https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 packages_bastion_openstack:
   - python-openstackclient
   - python-heatclient

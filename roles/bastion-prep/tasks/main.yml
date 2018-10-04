@@ -1,60 +1,20 @@
-- name: check if host already registered
-  command: subscription-manager list --available --match-installed --matches=*Openshift* --pool-only
-  register: subs_result
-  failed_when: false
-  changed_when: "'This system is not yet registered' in subs_result.stderr"
-
-- name: Subscribe to Red Hat using username
-  redhat_subscription:
-    state: present
-    username: "{{ rhn_username_or_org_id }}"
-    password: "{{ rhn_password_or_activation_key }}"
-    pool: "{{ rhn_pool }}"
-    #force_register: yes
-  register: subscribe_user
-  retries: 5
-  delay: 5
-  when: subscription_use_username == True and subs_result.changed
-
-- name: Subscribe to Red Hat using activation key
-  redhat_subscription:
-    state: present
-    org_id: "{{ rhn_username_or_org_id }}"
-    activationkey: "{{ rhn_password_or_activation_key }}"
-    pool: "{{ rhn_pool }}"
-    #force_register: yes
-  register: subscribe_activation_key
-  retries: 5
-  delay: 5
-  when: subscription_use_username == False and subs_result.changed
-
-- debug:
-    msg: "username subscription {{ subscribe_user.changed }}"
-
-- debug:
-    msg: "activation key subscription {{ subscribe_activation_key.changed }}"
-
-- name: Disable all repos
-  shell: |
-    subscription-manager repos --disable=*
-  retries: 5
-  delay: 5
-  when: subscribe_user.changed or subscribe_activation_key.changed
-
-- name: Enable correct repos
-  command: "subscription-manager repos --enable={{item}}"
-  when: subscribe_user.changed or subscribe_activation_key.changed
-  retries: 5
-  delay: 5
-  with_items: "{{repos}}"
-
-- name: Enable bastion specific repos
+- name: Enable bastion specific repos (redhat)
   command: "subscription-manager repos --enable={{item}}"
   retries: 5
   delay: 5
   with_items: "{{repos_bastion}}"
+  when: openshift_deployment == "openshift-enterprise"
 
-- name: Ensure that required packages are installed on target hosts
+- name: Enable bastion specific repos (centos)
+  yum:
+    name: "{{item}}"
+    state: latest
+  retries: 5
+  delay: 5
+  with_items: "{{origin_repos_bastion}}"
+  when: openshift_deployment == "origin"
+
+- name: Ensure that required packages are installed on bastion
   yum:
     name: "{{item}}"
     state: latest
@@ -62,25 +22,61 @@
   delay: 5
   with_items: "{{packages}}"
 
-- name: Install required openstack packages for bastion
+- name: Perform yum update
+  yum:
+    name=*
+    state=latest
+
+- name: Install required openstack packages for bastion (redhat)
   yum:
     name: "{{item}}"
     state: installed
     disablerepo: rhel-7-fast-datapath-rpms
     disablerepo: rhel-7-server-ose-{{ openshift_version }}-rpms
   with_items: "{{packages_bastion_openstack}}"
+  when: openshift_deployment == "openshift-enterprise"
 
-- name: Install required openstack packages for bastion
+- name: Install required openstack packages for bastion (centos)
+  yum:
+    name: "{{item}}"
+    state: installed
+  with_items: "{{packages_bastion_openstack}}"
+  when: openshift_deployment == "origin"
+
+- name: Install required installer packages for bastion (redhat)
   yum:
     name: "{{item}}"
     state: installed
     disablerepo: rhel-7-server-openstack-{{ openstack_version }}-tools-rpms
-  with_items: "{{packages_bastion_openshift}}"
+  with_items: "{{ packages_bastion_openshift }}"
+  when: openshift_deployment == "openshift-enterprise"
+
+- name: Install required installer packages for bastion (centos)
+  yum:
+    name: "{{item}}"
+    state: installed
+  with_items: "{{packages_bastion_origin}}"
+  when: openshift_deployment == "origin"
+
+- name: Disable epel repository (centos)
+  yum_repository:
+    name: epel
+    baseurl: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    description: "EPEL"
+    enabled: no
+  when: openshift_deployment == "origin"
+
+- name: Clone OKD repository
+  git:
+    repo: 'https://github.com/openshift/openshift-ansible'
+    dest: /home/{{ ssh_user }}/openshift-ansible
+    version: release-{{ openshift_version }}
+  when: openshift_deployment == "origin"
 
 - name: Copy OpenStack ssh key to bastion
   copy:
     src: "{{ ssh_key_path }}"
-    dest: /home/cloud-user/admin.pem
+    dest: /home/{{ ssh_user }}/admin.pem
     mode: 0400
     owner: "{{ ssh_user }}"
 

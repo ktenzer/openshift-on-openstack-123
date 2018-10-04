@@ -24,6 +24,10 @@
 
   tasks:
   - import_role:
+      name: redhat_subscription
+    when: openshift_deployment == "openshift-enterprise"
+  
+  - import_role:
       name: all-prep
 
 - name: Setup All OpenShift Nodes
