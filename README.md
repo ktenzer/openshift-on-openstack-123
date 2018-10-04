@@ -407,6 +407,21 @@ Login in to UI.
 https://openshift.144.76.134.226.xip.io:8443
 ```
 
+# OKD
+OKD formally called OpenShift Origin (community version) is also supported. At this time up to release-3.10 is tested. To use OKD make sure you have a centos 7.5 image and set 'openshift_deployment=origin' in the vars file.
+
+Once you have run the deploy-openstack-infra.yml and prepare-openshift.yml playbooks as documented above run the following to install openshift OKD from bastion.
+
+Prerequisites playbook
+```
+[centosr@bastion ~] ansible-playbook -i /home/centos/openshift-inventory --private-key=/home/centos/admin.pem openshift-ansible/playbooks/prerequisites.yml
+```
+
+Deploy cluster playbook
+```
+[centosr@bastion ~] ansible-playbook -i /home/centos/openshift-inventory --private-key=/home/centos/admin.pem openshift-ansible/playbooks/deploy_cluster.yml
+```
+
 # Optional
 Configure admin user
 ```
