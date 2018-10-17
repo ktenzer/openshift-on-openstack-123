@@ -1,10 +1,20 @@
-- name: Setup OpenShift inventory file
+- name: Setup OpenShift Enterprise inventory file
   template:
-    src: templates/openshift-inventory.j2
+    src: templates/openshift-inventory-enterprise.j2
     dest: /home/{{ ssh_user }}/openshift-inventory
     owner: root
     group: root
     mode: 0755
+  when: openshift_deployment == "openshift-enterprise"
+
+- name: Setup OpenShift OKD inventory file
+  template:
+    src: templates/openshift-inventory-origin.j2
+    dest: /home/{{ ssh_user }}/openshift-inventory
+    owner: root
+    group: root
+    mode: 0755
+  when: openshift_deployment == "origin"
 
 - name: Configure masters dynamically
   lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory

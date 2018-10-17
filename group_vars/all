@@ -13,10 +13,10 @@ packages:
 packages_bastion_openshift:
   - openshift-ansible
 packages_bastion_origin:
-  - ansible
+  - https://releases.ansible.com/ansible/rpm/release/epel-7-x86_64/ansible-2.6.5-1.el7.ans.noarch.rpm
   - pyOpenSSL
 origin_repos_bastion:
-  - https://repos.fedorapeople.org/repos/openstack/openstack-{{ openstack_release }}/rdo-release-{{ openstack_release }}-1.noarch.rpm
+  - https://repos.fedorapeople.org/repos/openstack/openstack-{{ openstack_release }}/rdo-release-{{ openstack_release }}-0.noarch.rpm
   - https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 packages_bastion_openstack:
   - python-openstackclient
@@ -26,6 +26,6 @@ repos:
   - rhel-7-server-extras-rpms
   - rhel-7-server-ose-{{ openshift_version }}-rpms
   - rhel-7-fast-datapath-rpms
-  - rhel-7-server-ansible-2.4-rpms
+  - rhel-7-server-ansible-2.6-rpms
 repos_bastion:
   - rhel-7-server-openstack-{{ openstack_version }}-tools-rpms

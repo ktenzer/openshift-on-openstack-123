@@ -1,0 +1,131 @@
+# Create an OSEv3 group that contains the masters and nodes groups
+[OSEv3:children]
+masters
+etcd
+nodes
+
+# Set variables common for all OSEv3 hosts
+[OSEv3:vars]
+# SSH user, this user should allow ssh based auth without requiring a password
+ansible_ssh_user={{ ssh_user }}
+ansible_become=yes
+
+# OpenShift Deployment, enterprise of course!
+openshift_deployment_type={{ openshift_deployment }}
+oreg_url=registry.redhat.io/openshift3/ose-${component}:${version}
+oreg_auth_user={{ rhn_username_or_org_id }}
+oreg_auth_password={{ rhn_password_or_activation_key }}
+os_firewall_use_firewalld=true
+openshift_clock_enabled=true
+
+# Set Domain for Apps
+openshift_master_default_subdomain=apps.{{ hostvars['infra0']['lb_infra'] }}.xip.io
+
+# default project node selector
+osm_default_node_selector='node-role.kubernetes.io/compute=true'
+
+# Native high availability cluster method with optional load balancer.
+openshift_master_cluster_hostname=openshift.{{ hostvars['master0']['lb_master'] }}.xip.io
+openshift_master_cluster_public_hostname=openshift.{{ hostvars['master0']['lb_master'] }}.xip.io
+openshift_override_hostname_check=true
+
+# Openstack
+openshift_cloudprovider_kind=openstack
+openshift_cloudprovider_openstack_auth_url={{ openstack_auth_url }}
+openshift_cloudprovider_openstack_username={{ openstack_user }}
+openshift_cloudprovider_openstack_password='"{{ openstack_passwd }}"'
+openshift_cloudprovider_openstack_domain_name=Default
+openshift_cloudprovider_openstack_tenant_name={{ openstack_project }}
+openshift_cloudprovider_openstack_region=RegionOne
+openshift_cloudprovider_openstack_blockstorage_version=v2
+openshift_cloudprovider_openstack_lb_subnet_id={{ service_subnet_id }}
+
+# Enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+openshift_master_htpasswd_users={'{{ openshift_user }}': '{{ openshift_passwd }}'}
+
+# Set networking to multi-tenant
+os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
+
+# Configure SDN cluster network and kubernetes service CIDR blocks. These
+# network blocks should be private and should not conflict with network blocks
+# in your infrastructure that pods may require access to. Can not be changed
+# after deployment.
+osm_cluster_network_cidr=10.30.0.0/16
+openshift_portal_net=172.30.0.0/16
+osm_host_subnet_length=8
+
+# Disable disk and memory checks
+openshift_disable_check=disk_availability,memory_availability,docker_storage,package_availability,package_version,docker_image_availability
+
+# Deploy router
+openshift_hosted_manage_router=true
+openshift_hosted_router_selector='node-role.kubernetes.io/infra=true'
+
+# Deploy Registry
+openshift_hosted_manage_registry=true
+openshift_registry_selector='node-role.kubernetes.io/infra=true'
+openshift_hosted_registry_replicas={{ registry_replicas }}
+
+# Deploy logging
+openshift_logging_install_logging=false
+openshift_logging_kibana_hostname=logging.apps.{{ hostvars['infra0']['lb_infra'] }}.xip.io
+openshift_logging_use_ops=false
+openshift_logging_master_url=https://kubernetes.default.svc.cluster.local
+openshift_logging_public_master_url=openshift.{{ hostvars['master0']['lb_master'] }}.xip.io
+openshift_logging_curator_default_days=7
+openshift_logging_es_memory_limit=1Gi
+openshift_logging_es_cpu_limit=250m
+openshift_logging_es_pvc_dynamic=true
+openshift_logging_es_pvc_size=10Gi
+openshift_logging_curator_nodeselector={"node-role.kubernetes.io/infra":"true"}
+openshift_logging_es_nodeselector={"node-role.kubernetes.io/infra":"true"}
+openshift_logging_fluentd_nodeselector={"fluentd":"true"}
+openshift_logging_kibana_nodeselector={"node-role.kubernetes.io/infra":"true"}
+
+# Deploy Metrics
+openshift_metrics_install_metrics=false
+openshift_metrics_start_cluster=true
+openshift_metrics_hawkular_hostname=metrics.apps.{{ hostvars['infra0']['lb_infra'] }}.xip.io
+openshift_metrics_cassandra_limits_memory=1Gi
+openshift_metrics_cassandra_requests_cpu=250m
+openshift_metrics_hawkular_replicas=1
+openshift_metrics_hawkular_limits_memory=1Gi
+openshift_metrics_hawkular_limits_cpu=500m
+openshift_metrics_hawkular_requests_memory=768Mi
+openshift_metrics_hawkular_requests_cpu=250m
+openshift_metrics_duration=5
+openshift_metrics_cassandra_storage_type=dynamic
+openshift_metrics_cassandra_pvc_size=10Gi
+openshift_metrics_cassandra_nodeselector={"node-role.kubernetes.io/infra":"true"}
+openshift_metrics_hawkular_nodeselector={"node-role.kubernetes.io/infra":"true"}
+openshift_metrics_heapster_nodeselector={"node-role.kubernetes.io/infra":"true"}
+openshift_metrics_heapster_requests_memory=256Mi
+openshift_metrics_heapster_limits_memory=500Mi
+
+# Deploy Prometheus
+openshift_hosted_prometheus_deploy=false
+openshift_prometheus_node_selector={"node-role.kubernetes.io/infra":"true"}
+
+# Deploy Grafana
+openshift_grafana_state=absent
+openshift_grafana_namespace=openshift-grafana
+openshift_grafana_prometheus_namespace=openshift-metrics
+openshift_grafana_node_selector={"node-role.kubernetes.io/infra":"true"}
+openshift_grafana_storage_type=pvc
+openshift_grafana_pvc_size=2Gi
+
+# OpenShift Template Service Broker
+openshift_template_service_broker_namespaces=['openshift']
+
+# Deploy Service Catalog
+openshift_enable_service_catalog=true
+
+# host group for masters
+[masters]
+
+# host group for etcd
+[etcd]
+
+# host group for nodes, includes region info
+[nodes]
