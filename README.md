@@ -6,11 +6,12 @@ If you want to provide additional features, please feel free to contribute via p
 We are happy to track and discuss ideas, topics and requests via 'Issues'.
 
 # Releases
-For each release of OpenShift a release branch will be created. Starting with OpenShift 3.9 we will follow the OpenShift release version so it is easy to tell what release branch goes with OpenShift version.
+For each release of OpenShift a release branch will be created. Starting with OpenShift 3.9 we will follow the OpenShift release version so it is easy to tell what release branch goes with OpenShift version. The installer support OpenShift Enterprise and OKD starting with 3.11. Note: CentOS OKD rpms are released after enterprise so you may have to wait a bit for OKD.
 
 * release-1.0 OpenShift 3.7 and earlier
 * release-3.9 OpenShift 3.9
 * release-3.10 OpenShift 3.10
+* release-3.11 OpenShift 3.11
 
 In addition I would like to metion I borrowed a lot of ideas from two other projects.
 * [OpenShift setup for Hetzner from RH SSA team](https://github.com/RedHat-EMEA-SSA-Team/hetzner-ocp)
@@ -151,9 +152,9 @@ Change dir to repository
 # cd openshift-on-openstack-123
 ```
 
-Checkout release branch 3.10
+Checkout release branch 3.11
 ```
-# git checkout release-3.10
+# git checkout release-3.11
 ```
 
 Configure Parameters
@@ -177,12 +178,14 @@ ssh_user: cloud-user
 ssh_key_path: /root/admin.pem
 ssh_key_name: admin
 stack_name: openshift
+openstack_release: queens
 openstack_version: "13"
 contact: admin@ocp3.lab
 heat_template_path: /root/openshift-on-openstack-123/heat/openshift_single_lbaas.yaml
 
 ### OpenShift Settings ###
-openshift_version: "3.10"
+openshift_deployment: openshift-enterprise
+openshift_version: "3.11"
 docker_version: "1.13.1"
 openshift_ha: false
 registry_replicas: 1
@@ -322,32 +325,6 @@ node1                      : ok=18   changed=13   unreachable=0    failed=0
 ![](images/three.png)
 
 ```[Bastion Host]```
-
-Deploy OpenShift (3.7 or lower).
-```
-[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
-PLAY RECAP *****************************************************************************************
-infra0.ocp3.lab            : ok=183  changed=59   unreachable=0    failed=0
-infra1.ocp3.lab            : ok=183  changed=59   unreachable=0    failed=0
-localhost                  : ok=12   changed=0    unreachable=0    failed=0
-master0.ocp3.lab           : ok=635  changed=265  unreachable=0    failed=0
-master1.ocp3.lab           : ok=635  changed=265  unreachable=0    failed=0
-master2.ocp3.lab           : ok=635  changed=265  unreachable=0    failed=0
-node0.ocp3.lab             : ok=183  changed=59   unreachable=0    failed=0
-node1.ocp3.lab             : ok=183  changed=59   unreachable=0    failed=0
-
-
-INSTALLER STATUS ***********************************************************************************
-Initialization             : Complete
-Health Check               : Complete
-etcd Install               : Complete
-Master Install             : Complete
-Master Additional Install  : Complete
-Node Install               : Complete
-Hosted Install             : Complete
-Service Catalog Install    : Complete
-```
-
 Deploy OpenShift (3.9 or higher)
 
 In OpenShift 3.9 the playbook names changed and in addition the pre-requisite playbook was added.
@@ -369,22 +346,26 @@ Initialization             : Complete (0:04:16)
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
 
 PLAY RECAP *****************************************************************************************
-infra0.ocp3.lab            : ok=136  changed=54   unreachable=0    failed=0
-localhost                  : ok=12   changed=0    unreachable=0    failed=0
-master0.ocp3.lab           : ok=626  changed=259  unreachable=0    failed=0
-node0.ocp3.lab             : ok=77   changed=27   unreachable=0    failed=0
+infra0                     : ok=118  changed=20   unreachable=0    failed=0
+localhost                  : ok=11   changed=0    unreachable=0    failed=0
+master0                    : ok=715  changed=237  unreachable=0    failed=0
+node0                      : ok=118  changed=21   unreachable=0    failed=0
 
 
 INSTALLER STATUS ***********************************************************************************
-Initialization             : Complete (0:01:40)
-Health Check               : Complete (0:13:48)
-etcd Install               : Complete (0:12:44)
-Master Install             : Complete (0:23:33)
-Master Additional Install  : Complete (0:27:00)
-Node Install               : Complete (0:39:11)
-Hosted Install             : Complete (0:03:01)
-Web Console Install        : Complete (0:02:00)
-Service Catalog Install    : Complete (0:04:39)
+Initialization               : Complete (0:00:32)
+Health Check                 : Complete (0:00:01)
+Node Bootstrap Preparation   : Complete (0:09:24)
+etcd Install                 : Complete (0:01:06)
+Master Install               : Complete (0:06:04)
+Master Additional Install    : Complete (0:01:51)
+Node Join                    : Complete (0:00:37)
+Hosted Install               : Complete (0:00:49)
+Cluster Monitoring Operator  : Complete (0:01:15)
+Web Console Install          : Complete (0:00:31)
+Console Install              : Complete (0:00:27)
+metrics-server Install       : Complete (0:00:00)
+Service Catalog Install      : Complete (0:01:57)
 ```
 
 Run post install playbook (only needed prior to 3.10, ignore for 3.10 and higher)
@@ -408,7 +389,7 @@ https://openshift.144.76.134.226.xip.io:8443
 ```
 
 # OKD
-OKD formally called OpenShift Origin (community version) is also supported. At this time up to release-3.10 is tested. To use OKD make sure you have a centos 7.5 image and set 'openshift_deployment=origin' in the vars file.
+OKD formally called OpenShift Origin (community version) is also supported starting with release-3.11 branch. To use OKD make sure you have a centos 7.5 image and set 'openshift_deployment=origin' in the vars file.
 
 Once you have run the deploy-openstack-infra.yml and prepare-openshift.yml playbooks as documented above run the following to install openshift OKD from bastion.
 

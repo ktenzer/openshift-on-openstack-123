@@ -40,9 +40,12 @@ openshift_cloudprovider_openstack_region=RegionOne
 openshift_cloudprovider_openstack_blockstorage_version=v2
 openshift_cloudprovider_openstack_lb_subnet_id={{ service_subnet_id }}
 
-# Enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
-openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
-openshift_master_htpasswd_users={'{{ openshift_user }}': '{{ openshift_passwd }}'}
+# Enable OpenStack Keystone authentication
+openshift_master_identity_providers=[{'name': 'keystone', 'login': 'true', 'challenge': 'true', 'mappingMethod': 'claim', 'kind': 'KeystonePasswordIdentityProvider', 'domainName': 'default', 'url': '{{ openstack_auth_url }}', 'useKeystoneIdentity': 'false'}]
+
+# Httpasswd authentication, disabled
+#openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+#openshift_master_htpasswd_users={'{{ openshift_user }}': '{{ openshift_passwd }}'}
 
 # Set networking to multi-tenant
 os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
