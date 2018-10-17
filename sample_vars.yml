@@ -19,6 +19,7 @@ contact: admin@ocp3.lab
 heat_template_path: /root/openshift-on-openstack-123/heat/openshift_single_lbaas.yaml
 
 ### OpenShift Settings ###
+### Deployment can be openshift enterprise or origin for OKD ###
 openshift_deployment: openshift-enterprise
 openshift_version: "3.11"
 docker_version: "1.13.1"
@@ -28,6 +29,7 @@ openshift_user: admin
 openshift_passwd: <password>
 
 ### Red Hat Subscription ###
+### This is only needed for openshift-enterprise ###
 subscription_use_username: True
 rhn_username_or_org_id: <user or org id>
 rhn_password_or_activation_key: <password or activation key>
@@ -45,6 +47,7 @@ infra_server_group_policies: "['soft-anti-affinity']"
 node_server_group_policies: "['soft-anti-affinity']"
 
 ### OpenStack Instance Flavors ###
+### These flavors need to exist in OpenStack ###
 bastion_flavor: ocp.bastion
 master_flavor: ocp.master
 infra_flavor: ocp.infra
