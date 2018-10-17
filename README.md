@@ -569,3 +569,7 @@ When installing the optional Garafana, adding the Prometheus datasource sometime
 ## Issue 6: FQDNs cause OCP 3.10 install to fail
 
 Using FQDNs for masters, nodes or infras breaks OCP 3.10. Use short hostname only. Also ensure inventory file also only uses short hostname
+
+## Issue 7: Ansible 2.7 causes control plane to not start
+
+Don't use ansible 2.7 with OpenShift or OKD 3.11 there is an issue where etcd playbooks won't run which leads to control plane not starting. Use 2.6, this is tested and working. This deployment will force 2.6 so 2.7 doesnt end up on systems by accident.
