@@ -132,6 +132,14 @@ Add internal network to router as interface
 # openstack router add subnet router1 test_subnet
 ```
 
+# OpenShift Authentication
+This deployment will configure authentication through OpenStack keystone. This means you need to create users in OpenStack so they are available to OpenShift. All users that successfully authenticate from OpenShift to Keystone will be allowed to login. They will only have permissions to create new projects and not see anyone elses projects. If you would like something else you can configure the inventory file manually before deploying OpenShift cluster.
+
+Create OpenStack User for OpenShift
+```
+# openstack user create --project admin --password redhat123 ktenzer
+```
+
 # Install
 ![](images/one.png)
 
