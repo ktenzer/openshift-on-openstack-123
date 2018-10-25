@@ -15,6 +15,9 @@ openshift_deployment_type={{ openshift_deployment }}
 os_firewall_use_firewalld=true
 openshift_clock_enabled=true
 
+# OKD Additional repos in case not released yet to centos
+#openshift_additional_repos=[{'id': 'centos-okd-ci', 'name': 'centos-okd-ci', 'baseurl' :'https://rpms.svc.ci.openshift.org/openshift-origin-v3.11', 'gpgcheck' :'0', 'enabled' :'1'}]
+
 # Set Domain for Apps
 openshift_master_default_subdomain=apps.{{ hostvars['infra0']['lb_infra'] }}.xip.io
 
@@ -38,7 +41,7 @@ openshift_cloudprovider_openstack_blockstorage_version=v2
 openshift_cloudprovider_openstack_lb_subnet_id={{ service_subnet_id }}
 
 # Enable OpenStack Keystone authentication
-openshift_master_identity_providers=[{'name': 'keystone', 'login': 'true', 'challenge': 'true', 'mappingMethod': 'claim', 'kind': 'KeystonePasswordIdentityProvider', 'domainName': 'default', 'url': '{{ openstack_auth_url }}', 'useKeystoneIdentity': 'false'}]
+openshift_master_identity_providers=[{'name': 'keystone', 'login': 'true', 'challenge': 'true', 'mappingMethod': 'claim', 'kind': 'KeystonePasswordIdentityProvider', 'domainName': 'default', 'url': '{{ openstack_auth_url }}'}]
 
 # Httpasswd authentication, disabled
 #openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]

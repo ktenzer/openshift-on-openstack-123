@@ -19,3 +19,9 @@
     name: "{{item}}"
     state: installed
   with_items: "{{packages}}"
+
+- name: Ensure NetworkManager is enabled and started
+  systemd:
+    name: NetworkManager
+    enabled: yes
+    state: started
