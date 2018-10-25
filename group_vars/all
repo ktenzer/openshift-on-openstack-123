@@ -10,6 +10,7 @@ packages:
   - sos
   - psacct
   - yum-utils
+  - NetworkManager
 packages_bastion_openshift:
   - openshift-ansible
 packages_bastion_origin:
