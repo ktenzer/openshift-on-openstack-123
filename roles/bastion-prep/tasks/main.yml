@@ -3,7 +3,19 @@
   retries: 5
   delay: 5
   with_items: "{{repos_bastion}}"
-  when: openshift_deployment == "openshift-enterprise"
+  when: openshift_deployment == "openshift-enterprise" and not rhn_local_repo
+
+- name: Enable correct local repos
+  yum_repository:
+    name: "{{item}}"
+    description: "{{item}}"
+    file: openshift
+    baseurl: "{{rhn_local_repo_base_url}}/{{item}}"
+    gpgcheck: no
+  with_items:
+    - "{{repos_bastion}}"
+    - "{{repos}}"
+  when: openshift_deployment == "openshift-enterprise" and rhn_local_repo
 
 - name: Enable bastion specific repos (centos)
   yum:

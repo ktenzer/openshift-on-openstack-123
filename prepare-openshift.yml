@@ -25,7 +25,7 @@
   tasks:
   - import_role:
       name: redhat_subscription
-    when: openshift_deployment == "openshift-enterprise"
+    when: openshift_deployment == "openshift-enterprise" and not rhn_local_repo
   
   - import_role:
       name: all-prep

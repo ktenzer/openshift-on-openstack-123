@@ -30,6 +30,8 @@ openshift_passwd: <password>
 
 ### Red Hat Subscription ###
 ### This is only needed for openshift-enterprise ###
+rhn_local_repo: False
+rhn_local_repo_base_url: http://<ip address or hostname>
 subscription_use_username: True
 rhn_username_or_org_id: <user or org id>
 rhn_password_or_activation_key: <password or activation key>

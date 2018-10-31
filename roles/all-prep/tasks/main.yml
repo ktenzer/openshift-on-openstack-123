@@ -6,6 +6,16 @@
     group: root
     mode: 0644
 
+- name: Enable correct local repos
+  yum_repository:
+    name: "{{item}}"
+    description: "{{item}}"
+    file: openshift
+    baseurl: "{{rhn_local_repo_base_url}}/{{item}}"
+    gpgcheck: no
+  with_items: "{{repos}}"
+  when: openshift_deployment == "openshift-enterprise" and rhn_local_repo
+
 - name: Ensure that required packages are present on target hosts
   yum:
     name: "{{item}}"
