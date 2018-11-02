@@ -107,16 +107,12 @@ openshift_metrics_heapster_requests_memory=256Mi
 openshift_metrics_heapster_limits_memory=500Mi
 
 # Deploy Prometheus
-openshift_hosted_prometheus_deploy=false
-openshift_prometheus_node_selector={"node-role.kubernetes.io/infra":"true"}
-
-# Deploy Grafana
-openshift_grafana_state=absent
-openshift_grafana_namespace=openshift-grafana
-openshift_grafana_prometheus_namespace=openshift-metrics
-openshift_grafana_node_selector={"node-role.kubernetes.io/infra":"true"}
-openshift_grafana_storage_type=pvc
-openshift_grafana_pvc_size=2Gi
+openshift_cluster_monitoring_operator_install=true
+openshift_cluster_monitoring_operator_prometheus_storage_capacity=50Gi
+openshift_cluster_monitoring_operator_alertmanager_storage_capacity=2Gi
+openshift_cluster_monitoring_operator_node_selector={"node-role.kubernetes.io/infra":"true"}
+openshift_cluster_monitoring_operator_prometheus_storage_enabled=true
+openshift_cluster_monitoring_operator_alertmanager_storage_enabled=true
 
 # OpenShift Template Service Broker
 openshift_template_service_broker_namespaces=['openshift']
