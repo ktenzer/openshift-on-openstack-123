@@ -6,6 +6,17 @@
     group: root
     mode: 0644
 
+- name: copy certificate authority to trusted ca path of the os
+  copy:
+    src: ~/cacert.pem
+    dest: /etc/pki/ca-trust/source/anchors
+  sudo: yes
+  when: bastion_repo
+
+- name: update trusted ca redhat
+  shell: /bin/update-ca-trust
+  when: bastion_repo
+
 - name: Set correct repo ip if bastion repo is enabled
   set_fact:
     repo_base_url: "http://{{hostvars['bastion']['ansible_default_ipv4']['address'] }}/repo"

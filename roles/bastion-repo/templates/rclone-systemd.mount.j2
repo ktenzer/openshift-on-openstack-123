@@ -8,7 +8,7 @@ After=network-online.target
 What=rclonefs#Swift1://{{swift_rhn_repo_container_name}}
 Where={{swift_openshift_rhn_repo_mount}}
 Type=fuse
-Options=auto,config=/root/.config/rclone/rclone.conf,allow-other,default-permissions,rw,fast-list,cache-writes,vfs-cache-mode=writes,cache-dir=/tmp/rclone/vfs,cache-db-path=/tmp/rclone/cache,dir-cache-time=3600m
+Options=auto,config=/root/.config/rclone/rclone.conf,allow-other,default-permissions,rw,fast-list,cache-writes,vfs-cache-mode=writes,cache-dir=/tmp/rclone/vfs,cache-db-path=/tmp/rclone/cache
 TimeoutSec=30
 
 [Install]
