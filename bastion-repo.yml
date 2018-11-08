@@ -1,0 +1,20 @@
+---
+- name: Deploy the OpenShift Cluster Infrastructure
+  hosts: localhost
+  connection: local
+  become: no
+  gather_facts: no
+
+  tasks:
+  - import_role:
+      name: osp-inventory
+
+- name: Configure local RHN repos on Bastion
+  hosts: bastion
+  become: true
+
+  tasks:
+
+  - import_role:
+      name: bastion-repo
+    when: openshift_deployment == "openshift-enterprise"

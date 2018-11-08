@@ -6,12 +6,22 @@
     group: root
     mode: 0644
 
+- name: Set correct repo ip if bastion repo is enabled
+  set_fact:
+    repo_base_url: "http://{{hostvars['bastion']['ansible_default_ipv4']['address'] }}/repo"
+  when: bastion_repo
+
+- name: Set correct repo ip if bastion repo is not enabled
+  set_fact:
+    repo_base_url: "{{rhn_local_repo_base_url}}"
+  when: not bastion_repo
+
 - name: Enable correct local repos
   yum_repository:
     name: "{{item}}"
     description: "{{item}}"
     file: openshift
-    baseurl: "{{rhn_local_repo_base_url}}/{{item}}"
+    baseurl: "{{repo_base_url}}/{{item}}"
     gpgcheck: no
   with_items: "{{repos}}"
   when: openshift_deployment == "openshift-enterprise" and rhn_local_repo

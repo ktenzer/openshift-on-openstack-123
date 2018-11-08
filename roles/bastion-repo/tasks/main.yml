@@ -1,0 +1,196 @@
+- name: Install required installer packages for bastion (redhat)
+  yum:
+    name: "{{item}}"
+    state: installed
+  with_items:
+    - yum-utils
+    - createrepo
+    - httpd.x86_64
+    - docker-python.x86_64
+    - python-virtualenv.noarch
+    - fuse
+    - docker
+
+- name: Create repo directory
+  file:
+    path: /var/www/html/repo
+    state: directory
+
+- name: Install rclone
+  yum:
+    name: "{{rclone_url}}"
+    state: present
+
+- name: Create rclone config directory
+  file:
+    path: /root/.config/rclone
+    state: directory
+
+- name: Create rclone config
+  template:
+    src: templates/rclone.conf.j2
+    dest: /root/.config/rclone/rclone.conf
+
+- name: Copy rclonefs script
+  copy:
+    src: files/rclonefs
+    dest: /bin/rclonefs
+    mode: 0755
+
+- name: Create rclone systemd mount file
+  template:
+    src: templates/rclone-systemd.mount.j2
+    dest: "/etc/systemd/system/{{swift_openshift_rhn_repo_mount[1:]| replace('/', '-')}}.mount"
+
+- name: Enable and start rclone systemd 
+  systemd:
+    state: started
+    daemon_reload: yes
+    name: "{{swift_openshift_rhn_repo_mount[1:]| replace('/', '-')}}.mount"
+    enabled: yes
+
+- name: Create python virual environment
+  pip:
+    name: certauth
+    virtualenv: ~/certauth
+    virtualenv_site_packages: yes
+
+- name: Check if we generate certificates
+  stat:
+    path: "{{registry_config_dir}}/certs"
+  register: certs
+
+- name: Create CA certificate
+  shell: |
+    source certauth/bin/activate
+    certauth ./rootca.pem -c "Bastion CA" 
+    certauth ./rootca.pem --hostname "bastion" -d ./certs_dir
+    openssl x509 -in certs_dir/bastion.pem > fullchain.pem
+    openssl x509 -in rootca.pem > cacert.pem
+    cat cacert.pem >> fullchain.pem
+    openssl rsa -in certs_dir/bastion.pem > privkey.pem
+    mkdir -p {{registry_config_dir}}/certs
+    cp privkey.pem {{registry_config_dir}}/certs
+    cp fullchain.pem {{registry_config_dir}}/certs
+  args:
+    chdir: /root
+  when: certs.stat.exists == False
+
+- name: Copy cacert.pem to trusted
+  copy:
+    src: /root/cacert.pem
+    dest: /etc/pki/ca-trust/source/anchors/cacert.pem
+    remote_src: yes
+  register: cacert
+
+- name: Update CA trust
+  command: update-ca-trust
+  when: cacert.changed
+ 
+- name: Create docker registry container
+  file:
+    path: "{{registry_config_dir}}"
+    state: directory
+    mode: 0755
+
+- name: Create docker registry config file
+  template:
+    src: templates/registry-config.yml.j2
+    dest: "{{registry_config_dir}}/config.yml"
+
+- name: Check if htpasswd is already present
+  stat:
+    path: "{{registry_config_dir}}/htpasswd"
+  register: p
+
+- name: Start and enable docker
+  systemd:
+    name: docker
+    state: restarted
+    enabled: yes
+
+- name:  Create docker registry user/pass
+  shell: |
+    docker run --entrypoint htpasswd registry:2 -Bbn {{registry_username}} {{ registry_password}} > {{registry_config_dir}}/htpasswd
+  when: p.stat.exists ==  False
+  become: yes
+
+- name: Run doocker registry
+  docker_container:
+    name: registry
+    image: registry:2
+    volumes:
+      - "{{registry_config_dir}}/config.yml:/etc/docker/registry/config.yml:Z"
+      - "{{registry_config_dir}}/htpasswd:/auth/htpasswd:Z"
+      - "{{registry_config_dir}}/certs:/certs:Z"
+    restart_policy: always
+    published_ports: "{{ansible_default_ipv4.address}}:5000:5000"
+
+#- name: Add insecure registry
+#  template:
+#    src: templates/daemon.json.j2
+#    dest: /etc/docker/daemon.json
+
+- name: Restart docker
+  systemd:
+    name: docker
+    state: restarted
+    enabled: yes
+
+- debug: var=platform_infrastructure
+
+- name: Log into upstream registry
+  docker_login:
+    registry: "{{upstream_registry}}"
+    username: "{{rhn_username_or_org_id}}"
+    password: "{{rhn_password_or_activation_key}}"
+
+- name: Log into private registry
+  docker_login:
+    registry: "{{local_registry}}"
+    username: "{{registry_username}}"
+    password: "{{registry_password}}"
+
+- name: pull an image
+  docker_image:
+    name: "{{item}}"
+  with_items:
+    - "{{platform_infrastructure}}"
+    - "{{platform_infrastructure_optional}}"
+
+- name: Tag images with local registry
+  command: docker tag "{{item}}" "{{item | replace(upstream_registry,local_registry)}}"
+  with_items:
+    - "{{platform_infrastructure}}"
+    - "{{platform_infrastructure_optional}}"
+
+- name: Tag images with major tag
+  command: docker tag "{{item | replace(upstream_registry,local_registry)}}" "{{item | replace(upstream_registry,local_registry) | replace(registry_tag,major_registry_tag)}}"
+  with_items:
+    - "{{platform_infrastructure}}"
+    - "{{platform_infrastructure_optional}}"
+
+- name: Push docker images with minor version
+  command: docker push "{{item | replace(upstream_registry,local_registry)}}"
+  with_items:
+    - "{{platform_infrastructure}}"
+    - "{{platform_infrastructure_optional}}"
+
+- name: Push docker images with major version
+  command: docker push "{{item | replace(upstream_registry,local_registry) | replace(registry_tag,major_registry_tag)}}"
+  with_items:
+    - "{{platform_infrastructure}}"
+    - "{{platform_infrastructure_optional}}"
+
+- name: Create reposync directory
+  file:
+    path: /root/repo
+    state: directory
+
+- name: Sync all required repositories
+  shell: |
+    /usr/bin/reposync -n -p /root/repo/ -r {{item}}
+    /usr/bin/createrepo --update  /root/repo/{{item}}
+    /usr/bin/rclone sync /root/repo/{{item}} Swift1://{{swift_rhn_repo_container_name}}/{{item}}
+    rm -rf /root/repo/{{item}}
+  with_items: "{{repos}}"
