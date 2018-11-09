@@ -8,9 +8,8 @@
 
 - name: copy certificate authority to trusted ca path of the os
   copy:
-    src: ~/cacert.pem
+    src: /etc/pki/ca-trust/source/anchors/cacert.pem
     dest: /etc/pki/ca-trust/source/anchors
-  sudo: yes
   when: bastion_repo
 
 - name: update trusted ca redhat

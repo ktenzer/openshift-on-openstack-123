@@ -11,6 +11,12 @@
     - fuse
     - docker
 
+- name: Enable and start httpd
+  systemd:
+    state: started
+    name: httpd
+    enabled: yes
+
 - name: Create repo directory
   file:
     path: /var/www/html/repo
@@ -54,8 +60,6 @@
     name: certauth
     virtualenv: ~/certauth
     virtualenv_site_packages: yes
-  extra_args: --user
-  become: false
 
 - name: Check if we generate certificates
   stat:
@@ -66,11 +70,11 @@
   shell: |
     source certauth/bin/activate
     certauth ./rootca.pem -c "Bastion CA" 
-    certauth ./rootca.pem --hostname "bastion" -d ./certs_dir
-    openssl x509 -in certs_dir/bastion.pem > fullchain.pem
+    certauth ./rootca.pem --hostname "{{local_registry}}" -d ./certs_dir
+    openssl x509 -in certs_dir/{{local_registry}}.pem > fullchain.pem
     openssl x509 -in rootca.pem > cacert.pem
     cat cacert.pem >> fullchain.pem
-    openssl rsa -in certs_dir/bastion.pem > privkey.pem
+    openssl rsa -in certs_dir/{{local_registry}}.pem > privkey.pem
     mkdir -p {{registry_config_dir}}/certs
     cp privkey.pem {{registry_config_dir}}/certs
     cp fullchain.pem {{registry_config_dir}}/certs
