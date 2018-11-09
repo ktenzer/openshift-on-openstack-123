@@ -1,0 +1,14 @@
+upstream_registry: registry.redhat.io
+local_registry: bastion.local
+registry_tag: v3.11.16
+major_registry_tag: v3.11
+
+rclone_url: https://downloads.rclone.org/v1.44/rclone-v1.44-linux-amd64.rpm
+swift_rhn_repo_container_name: openshift_rhn_repo
+swift_rhn_registry_container_name: openshift_rhn_registry
+swift_openshift_rhn_repo_mount: /var/www/html/repo
+
+# Docker registry
+registry_config_dir: /registry
+registry_username: docker
+registry_password: registry

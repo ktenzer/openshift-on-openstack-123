@@ -61,6 +61,12 @@
     virtualenv: ~/certauth
     virtualenv_site_packages: yes
 
+- name: Allow httpd access to fuse mount
+  seboolean:
+    name: httpd_use_fusefs
+    state: yes
+    persistent: yes
+
 - name: Check if we generate certificates
   stat:
     path: "{{registry_config_dir}}/certs"
@@ -143,8 +149,6 @@
     state: restarted
     enabled: yes
 
-- debug: var=platform_infrastructure
-
 - name: Log into upstream registry
   docker_login:
     registry: "{{upstream_registry}}"
@@ -211,7 +215,6 @@
   with_items: "{{repos}}"
   register: bastion_repo_dirs
 
-- debug: var=bastion_repo_dirs
 - name: Sync all required repositories
   shell: |
     reposync -n -p repo/ -r {{item.item}}
