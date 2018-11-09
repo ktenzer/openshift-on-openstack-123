@@ -1,0 +1,36 @@
+version: 0.1
+log:
+  accesslog:
+    disabled: false
+  level: info
+  formatter: text
+  fields:
+    service: registry
+    environment: staging
+storage:
+  swift:
+    username: {{openstack_user}}
+    password: {{openstack_passwd}}
+    authurl: {{openstack_auth_url}}
+    tenant: {{openstack_project}}
+    domain: {{openstack_domain}}
+    insecureskipverify: true
+    container: {{swift_rhn_registry_container_name}} 
+    rootdirectory: /
+  delete:
+    enabled: true
+  redirect:
+    disable: false
+auth:
+  htpasswd:
+    realm: basic-realm
+    path: /auth/htpasswd
+http:
+  addr: 0.0.0.0:443
+  prefix: /
+  host: https://{{local_registry}}:443
+  relativeurls: false
+  secret: asecretforlocaldevelopment
+  tls:
+    certificate: /certs/fullchain.pem
+    key: /certs/privkey.pem

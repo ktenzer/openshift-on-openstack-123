@@ -12,9 +12,16 @@ ansible_become=yes
 
 # OpenShift Deployment, enterprise of course!
 openshift_deployment_type={{ openshift_deployment }}
+{% if not bastion_repo %}
 oreg_url=registry.redhat.io/openshift3/ose-${component}:${version}
 oreg_auth_user={{ rhn_username_or_org_id }}
 oreg_auth_password={{ rhn_password_or_activation_key }}
+{% else %}
+oreg_url={{local_registry}}/openshift3/ose-${component}:${version}
+oreg_auth_user={{registry_username}}
+oreg_auth_password={{registry_password}}
+openshift_examples_modify_imagestreams=true
+{% endif %}
 os_firewall_use_firewalld=true
 openshift_clock_enabled=true
 

@@ -533,6 +533,34 @@ Run Playbook for logging OpenShift 3.9 and higher
 ```
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-logging/config.yml
 ```
+# Openshift disconnected install (optionally)
+Disconnected installation requires two Swift containers, which are used to store Docker images and RHEL repositories.
+```deploy-openstack-infra.yml``` playbook will do the following:
+* Install httpd on Bastion server
+* Install and configure Rclone, mount ```openshift_rhn_repo``` container  via systemd mount script to ```/var/www/html/repo```
+* Generate CA and SSL certificate for Docker private registry.
+* Setup Docker and configure Docker private registry to use Swift container ```openshift_rhn_registry``` as backend storage.
+* Replicate latest RHEL packages from required repositories (6GB), and sync them to ```openshift_rhn_repo``` container.
+* Download all required Openshift Docker images (6GB), re-tag them and push to private Docker registry running on Bastion.
+
+note: replication of RHEL repositories and Openshift Docker images will only happen once, if data exists in Swift containers this steps will be skipped.
+
+Set variables in vars.yml
+```
+bastion_repo: True
+```
+Create two required Swift containers
+```
+swift_rhn_repo_container_name: openshift_rhn_repo
+swift_rhn_registry_container_name: openshift_rhn_registry
+```
+
+Run below playbook after running ```deploy-openstack-infra.yml```
+```
+# ansible-playbook bastion-repo.yml --private-key=/root/admin.pem -e @vars.yml
+```
+Continue with step 2.
+
 
 # Issues
 ## Issue 1: Dynamic storage provisioning using cinder not working
