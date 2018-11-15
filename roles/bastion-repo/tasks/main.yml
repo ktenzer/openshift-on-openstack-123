@@ -1,3 +1,10 @@
+- name: Update host file
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "{{ hostvars['bastion']['ansible_default_ipv4']['address'] }} bastion bastion.local"
+    line: "{{ hostvars['bastion']['ansible_default_ipv4']['address'] }} bastion bastion.local"
+    state: present
+
 - name: Install required installer packages for bastion (redhat)
   yum:
     name: "{{item}}"
