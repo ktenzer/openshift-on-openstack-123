@@ -25,6 +25,11 @@ openshift_examples_modify_imagestreams=true
 os_firewall_use_firewalld=true
 openshift_clock_enabled=true
 
+# Enable CRI-O + Docker
+openshift_use_crio=True
+openshift_use_crio_only=False
+openshift_crio_enable_docker_gc=True
+
 # Set Domain for Apps
 openshift_master_default_subdomain=apps.{{ hostvars['infra0']['lb_infra'] }}.xip.io
 
