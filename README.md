@@ -306,7 +306,7 @@ Change dir to repository
 
 Prepare the nodes for deployment of OpenShift.
 ```
-[cloud-user@bastion ~]$ ./03_prepare-openshift.yml --private-key=/home/cloud-user/admin.pem -e @vars.yml
+[cloud-user@bastion ~]$ ./03_prepare-openshift.yml -e @vars.yml
 
 PLAY RECAP *****************************************************************************************
 bastion                    : ok=15   changed=7    unreachable=0    failed=0
@@ -328,7 +328,7 @@ Deploy OpenShift (3.9 or higher)
 In OpenShift 3.9 the playbook names changed and in addition the pre-requisite playbook was added.
 
 ```
-[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
 PLAY RECAP *****************************************************************************************
 infra0.ocp3.lab            : ok=61   changed=15   unreachable=0    failed=0
 localhost                  : ok=11   changed=0    unreachable=0    failed=0
@@ -341,7 +341,7 @@ Initialization             : Complete (0:04:16)
 ```
 
 ```
-[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
 
 PLAY RECAP *****************************************************************************************
 infra0                     : ok=118  changed=20   unreachable=0    failed=0
@@ -368,7 +368,7 @@ Service Catalog Install      : Complete (0:01:57)
 
 Run post install playbook (only needed prior to 3.10, ignore for 3.10 and higher)
 ```
-[cloud-user@bastion ~]$ ansible-playbook post-openshift.yml --private-key=/home/cloud-user/admin.pem -e @vars.yml
+[cloud-user@bastion ~]$ ansible-playbook post-openshift.yml -e @vars.yml
 
 PLAY RECAP **************************************************************************************************************************
 infra0                     : ok=4    changed=2    unreachable=0    failed=0
@@ -393,18 +393,18 @@ Once you have run the 01_deploy-openstack-infra.yml and 03_prepare-openshift.yml
 
 Prerequisites playbook
 ```
-[centosr@bastion ~] ansible-playbook -i /home/centos/openshift-inventory --private-key=/home/centos/admin.pem openshift-ansible/playbooks/prerequisites.yml
+[centosr@bastion ~] ansible-playbook -i /home/centos/openshift-inventory openshift-ansible/playbooks/prerequisites.yml
 ```
 
 Deploy cluster playbook
 ```
-[centosr@bastion ~] ansible-playbook -i /home/centos/openshift-inventory --private-key=/home/centos/admin.pem openshift-ansible/playbooks/deploy_cluster.yml
+[centosr@bastion ~] ansible-playbook -i /home/centos/openshift-inventory openshift-ansible/playbooks/deploy_cluster.yml
 ```
 
 # Optional
 Configure admin user
 ```
-[cloud-user@bastion ~]$ ssh -i /home/cloud-user/admin.pem cloud-user@master0
+[cloud-user@bastion ~]$ ssh master0
 ```
 
 Authenticate as system:admin user.
@@ -428,7 +428,7 @@ openshift_hosted_metrics_deploy=true
 
 Run playbook for metrics for OpenShift 3.7
 ```
-[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml
 PLAY RECAP **************************************************************************************************************************
 infra0.ocp3.lab            : ok=45   changed=4    unreachable=0    failed=0
 infra1.ocp3.lab            : ok=45   changed=4    unreachable=0    failed=0
@@ -447,7 +447,7 @@ Metrics Install            : Complete
 
 Run playbook for metrics for OpenShift 3.9 and higher
 ```
-[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-metrics/config.yml
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-metrics/config.yml
 PLAY RECAP *****************************************************************************************
 infra0.ocp3.lab            : ok=0    changed=0    unreachable=0    failed=0
 localhost                  : ok=11   changed=0    unreachable=0    failed=0
@@ -470,7 +470,7 @@ openshift_hosted_prometheus_deploy=true
 ```
 Run playbook for prometheus for OpenShift 3.9 and higher
 ```
-[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-prometheus/config.yml
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-prometheus/config.yml
 PLAY RECAP *****************************************************************************************
 infra0.ocp3.lab            : ok=0    changed=0    unreachable=0    failed=0
 localhost                  : ok=11   changed=0    unreachable=0    failed=0
@@ -492,7 +492,7 @@ openshift_grafana_state=present
 ```
 Run playbook for Grafana for OpenShift 3.9 and higher
 ```
-[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-grafana/config.yml
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-grafana/config.yml
 PLAY RECAP *****************************************************************************************
 infra0.ocp3.lab            : ok=0    changed=0    unreachable=0    failed=0
 localhost                  : ok=11   changed=0    unreachable=0    failed=0
@@ -516,12 +516,12 @@ openshift_hosted_logging_deploy=true
 
 Run playbook for logging OpenShift 3.7
 ```
-[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-logging.yml
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-logging.yml
 ```
 
 Run Playbook for logging OpenShift 3.9 and higher
 ```
-[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory --private-key=/home/cloud-user/admin.pem -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-logging/config.yml
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-logging/config.yml
 ```
 # Openshift disconnected install (optionally)
 Disconnected installation requires two Swift containers, which are used to store Docker images and RHEL repositories.
