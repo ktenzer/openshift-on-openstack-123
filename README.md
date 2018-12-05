@@ -231,11 +231,6 @@ Authenticate OpenStack Credentials
 # source /root/keystonerc_admin
 ```
 
-Disable host key checking
-```
-# export ANSIBLE_HOST_KEY_CHECKING=False
-```
-
 Deploy OpenStack Infrastructure for OpenShift
 ```
 # ansible-playbook deploy-openstack-infra.yml --private-key=/root/admin.pem -e @vars.yml
@@ -307,11 +302,6 @@ ssh -i /root/admin.pem cloud-user@144.76.134.229
 Change dir to repository
 ```
 # cd openshift-on-openstack-123
-```
-
-Disable host key checking
-```
-[cloud-user@bastion ~]$ export ANSIBLE_HOST_KEY_CHECKING=False
 ```
 
 Prepare the nodes for deployment of OpenShift.
