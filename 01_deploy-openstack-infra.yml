@@ -1,3 +1,4 @@
+#!/usr/bin/env ansible-playbook
 ---
 - name: Deploy the OpenShift Cluster Infrastructure
   hosts: localhost

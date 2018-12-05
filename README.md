@@ -233,7 +233,7 @@ Authenticate OpenStack Credentials
 
 Deploy OpenStack Infrastructure for OpenShift
 ```
-# ansible-playbook deploy-openstack-infra.yml --private-key=/root/admin.pem -e @vars.yml
+# ./01_deploy-openstack-infra.yml --private-key=/root/admin.pem -e @vars.yml
 ```
 
 ![](images/two.png)
@@ -306,7 +306,7 @@ Change dir to repository
 
 Prepare the nodes for deployment of OpenShift.
 ```
-[cloud-user@bastion ~]$ ansible-playbook prepare-openshift.yml --private-key=/home/cloud-user/admin.pem -e @vars.yml
+[cloud-user@bastion ~]$ ./03_prepare-openshift.yml --private-key=/home/cloud-user/admin.pem -e @vars.yml
 
 PLAY RECAP *****************************************************************************************
 bastion                    : ok=15   changed=7    unreachable=0    failed=0
@@ -389,7 +389,7 @@ https://openshift.144.76.134.226.xip.io:8443
 # OKD
 OKD formally called OpenShift Origin (community version) is also supported starting with release-3.11 branch. To use OKD make sure you have a centos 7.5 image and set 'openshift_deployment=origin' in the vars file.
 
-Once you have run the deploy-openstack-infra.yml and prepare-openshift.yml playbooks as documented above run the following to install openshift OKD from bastion.
+Once you have run the 01_deploy-openstack-infra.yml and 03_prepare-openshift.yml playbooks as documented above run the following to install openshift OKD from bastion.
 
 Prerequisites playbook
 ```
@@ -525,7 +525,7 @@ Run Playbook for logging OpenShift 3.9 and higher
 ```
 # Openshift disconnected install (optionally)
 Disconnected installation requires two Swift containers, which are used to store Docker images and RHEL repositories.
-```deploy-openstack-infra.yml``` playbook will do the following:
+```01_deploy-openstack-infra.yml``` playbook will do the following:
 * Install httpd on Bastion server
 * Install and configure Rclone, mount ```openshift_rhn_repo``` container  via systemd mount script to ```/var/www/html/repo```
 * Generate CA and SSL certificate for Docker private registry.
@@ -545,9 +545,9 @@ swift_rhn_repo_container_name: openshift_rhn_repo
 swift_rhn_registry_container_name: openshift_rhn_registry
 ```
 
-Run below playbook after running ```deploy-openstack-infra.yml```
+Run below playbook after running ```01_deploy-openstack-infra.yml```
 ```
-# ansible-playbook bastion-repo.yml --private-key=/root/admin.pem -e @vars.yml
+# ./02_bastion-repo.yml --private-key=/root/admin.pem -e @vars.yml
 ```
 Continue with step 2.
 
