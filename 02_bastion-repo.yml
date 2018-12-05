@@ -7,6 +7,10 @@
   gather_facts: no
 
   tasks:
+  - name: Include vars.yml
+    include_vars:
+      file: vars.yml
+
   - import_role:
       name: osp-inventory
 
@@ -15,6 +19,9 @@
   become: true
 
   tasks:
+  - name: Include vars.yml
+    include_vars:
+      file: vars.yml
 
   - import_role:
       name: bastion-repo

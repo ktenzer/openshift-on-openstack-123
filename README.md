@@ -233,7 +233,7 @@ Authenticate OpenStack Credentials
 
 Deploy OpenStack Infrastructure for OpenShift
 ```
-# ./01_deploy-openstack-infra.yml --private-key=/root/admin.pem -e @vars.yml
+# ./01_deploy-openstack-infra.yml --private-key=/root/admin.pem
 ```
 
 ![](images/two.png)
@@ -547,7 +547,7 @@ swift_rhn_registry_container_name: openshift_rhn_registry
 
 Run below playbook after running ```01_deploy-openstack-infra.yml```
 ```
-# ./02_bastion-repo.yml --private-key=/root/admin.pem -e @vars.yml
+# ./02_bastion-repo.yml --private-key=/root/admin.pem
 ```
 Continue with step 2.
 
