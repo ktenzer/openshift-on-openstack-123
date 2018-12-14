@@ -86,12 +86,14 @@
   when: openshift_deployment == "origin"
 
 - name: Create ~/.ssh/ directory
+  become: false
   file:
     path: ~/.ssh
     state: directory
     mode: 0700
 
 - name: Copy OpenStack ssh key to bastion
+  become: false
   copy:
     src: "{{ ssh_key_path }}"
     dest: ~/.ssh/id_rsa
