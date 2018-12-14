@@ -15,6 +15,9 @@
     OS_IDENTITY_API_VERSION: 3
 
   tasks:
+  - name: Include vars.yml
+    include_vars:
+      file: vars.yml
   - import_role:
       name: osp-inventory
 
@@ -24,6 +27,9 @@
   become: yes
 
   tasks:
+  - name: Include vars.yml
+    include_vars:
+      file: vars.yml
   - import_role:
       name: redhat_subscription
     when: openshift_deployment == "openshift-enterprise" and not rhn_local_repo
@@ -37,6 +43,9 @@
   become: true
 
   tasks:
+  - name: Include vars.yml
+    include_vars:
+      file: vars.yml
   - import_role:
       name: docker-prep
 
@@ -46,5 +55,8 @@
   become: true
 
   tasks:
+  - name: Include vars.yml
+    include_vars:
+      file: vars.yml
   - import_role:
       name: ocp-inventory
