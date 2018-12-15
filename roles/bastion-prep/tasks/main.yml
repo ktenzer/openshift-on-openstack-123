@@ -85,10 +85,18 @@
     version: release-{{ openshift_version }}
   when: openshift_deployment == "origin"
 
+- name: Create ~/.ssh/ directory
+  become: false
+  file:
+    path: ~/.ssh
+    state: directory
+    mode: 0700
+
 - name: Copy OpenStack ssh key to bastion
+  become: false
   copy:
     src: "{{ ssh_key_path }}"
-    dest: /home/{{ ssh_user }}/admin.pem
+    dest: ~/.ssh/id_rsa
     mode: 0400
     owner: "{{ ssh_user }}"
 
