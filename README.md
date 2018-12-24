@@ -327,7 +327,10 @@ node1                      : ok=18   changed=13   unreachable=0    failed=0
 ```[Bastion Host]```
 Deploy OpenShift (3.9 or higher)
 
-In OpenShift 3.9 the playbook names changed and in addition the pre-requisite playbook was added.
+In OpenShift 3.9 the playbook names changed and in addition the pre-requisite playbook was added.export 
+```
+$ ANSIBLE_HOST_KEY_CHECKING=False
+```
 
 ```
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
