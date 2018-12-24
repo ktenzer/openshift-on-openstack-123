@@ -329,7 +329,7 @@ Deploy OpenShift (3.9 or higher)
 
 In OpenShift 3.9 the playbook names changed and in addition the pre-requisite playbook was added.export 
 ```
-$ ANSIBLE_HOST_KEY_CHECKING=False
+$ export ANSIBLE_HOST_KEY_CHECKING=False
 ```
 
 ```
