@@ -232,6 +232,7 @@ Authenticate OpenStack Credentials
 ```
 
 Deploy OpenStack Infrastructure for OpenShift
+Note: make sure the path to your OpenStack keypair (ssh key) is set in ansible.cfg private_key_file parameter
 ```
 # ./01_deploy-openstack-infra.yml
 ```
