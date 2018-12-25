@@ -108,3 +108,11 @@
     mode: 0755
     owner: "{{ ssh_user }}"
     group: "{{ ssh_user }}"
+
+- name: Copy ansible.cfg to user home dir
+  copy:
+    src: "{{ playbook_dir }}/ansible.cfg"
+    dest: /home/{{ ssh_user }}/.ansible.cfg
+    mode: 0644
+    owner: "{{ ssh_user }}"
+    group: "{{ ssh_user }}"

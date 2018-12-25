@@ -226,14 +226,7 @@ node_flavor: ocp.node
 
 Note: If you want to run a single load balancer (to save floating ips) for masters and infra, instead of default two use following heat template ```heat_template_path: /root/openshift-on-openstack-123/heat/openshift_single_lbaas.yaml```.
 
-Authenticate OpenStack Credentials
-```
-# source /root/keystonerc_admin
-```
-
 Deploy OpenStack Infrastructure for OpenShift
-
-Note: make sure the path to your OpenStack keypair (ssh key) is set in ansible.cfg private_key_file parameter
 ```
 # ./01_deploy-openstack-infra.yml
 ```
@@ -325,12 +318,7 @@ node1                      : ok=18   changed=13   unreachable=0    failed=0
 ![](images/three.png)
 
 ```[Bastion Host]```
-Deploy OpenShift (3.9 or higher)
-
-In OpenShift 3.9 the playbook names changed and in addition the pre-requisite playbook was added.export 
-```
-$ export ANSIBLE_HOST_KEY_CHECKING=False
-```
+Deploy OpenShift
 
 ```
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
@@ -371,21 +359,6 @@ metrics-server Install       : Complete (0:00:00)
 Service Catalog Install      : Complete (0:01:57)
 ```
 
-Run post install playbook (only needed prior to 3.10, ignore for 3.10 and higher)
-```
-[cloud-user@bastion ~]$ ansible-playbook post-openshift.yml -e @vars.yml
-
-PLAY RECAP **************************************************************************************************************************
-infra0                     : ok=4    changed=2    unreachable=0    failed=0
-infra1                     : ok=4    changed=2    unreachable=0    failed=0
-localhost                  : ok=7    changed=6    unreachable=0    failed=0
-master0                    : ok=6    changed=4    unreachable=0    failed=0
-master1                    : ok=6    changed=4    unreachable=0    failed=0
-master2                    : ok=6    changed=4    unreachable=0    failed=0
-node0                      : ok=4    changed=2    unreachable=0    failed=0
-node1                      : ok=4    changed=2    unreachable=0    failed=0
-```
-
 Login in to UI.
 ```
 https://openshift.144.76.134.226.xip.io:8443
@@ -423,6 +396,9 @@ Make user OpenShift Cluster Administrator
 ```
 
 Install Metrics
+
+Note: Metrics is integrated with OpenShift UI and will be depricated in 4.0 but for 3.11 if you want metrics in UI it is still needed.
+
 Set metrics to true in inventory
 ```
 [cloud-user@bastion ~]$ vi openshift_inventory
@@ -431,26 +407,7 @@ openshift_hosted_metrics_deploy=true
 ...
 ```
 
-Run playbook for metrics for OpenShift 3.7
-```
-[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml
-PLAY RECAP **************************************************************************************************************************
-infra0.ocp3.lab            : ok=45   changed=4    unreachable=0    failed=0
-infra1.ocp3.lab            : ok=45   changed=4    unreachable=0    failed=0
-localhost                  : ok=11   changed=0    unreachable=0    failed=0
-master0.ocp3.lab           : ok=48   changed=4    unreachable=0    failed=0
-master1.ocp3.lab           : ok=48   changed=4    unreachable=0    failed=0
-master2.ocp3.lab           : ok=205  changed=48   unreachable=0    failed=0
-node0.ocp3.lab             : ok=45   changed=4    unreachable=0    failed=0
-node1.ocp3.lab             : ok=45   changed=4    unreachable=0    failed=0
-
-
-INSTALLER STATUS ********************************************************************************************************************
-Initialization             : Complete
-Metrics Install            : Complete
-```
-
-Run playbook for metrics for OpenShift 3.9 and higher
+Run playbook for metrics in OpenShift
 ```
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-metrics/config.yml
 PLAY RECAP *****************************************************************************************
@@ -465,51 +422,6 @@ Initialization             : Complete (0:01:34)
 Metrics Install            : Complete (0:04:37)
 ```
 
-Install Prometheus
-Set prometheus to true in inventory
-```
-[cloud-user@bastion ~]$ vi openshift_inventory
-...
-openshift_hosted_prometheus_deploy=true
-...
-```
-Run playbook for prometheus for OpenShift 3.9 and higher
-```
-[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-prometheus/config.yml
-PLAY RECAP *****************************************************************************************
-infra0.ocp3.lab            : ok=0    changed=0    unreachable=0    failed=0
-localhost                  : ok=11   changed=0    unreachable=0    failed=0
-master0.ocp3.lab           : ok=217  changed=47   unreachable=0    failed=0
-node0.ocp3.lab             : ok=0    changed=0    unreachable=0    failed=0
-
-INSTALLER STATUS ***********************************************************************************
-Initialization             : Complete (0:01:34)
-Prometheus Install            : Complete (0:04:37)
-```
-
-Install Grafana
-Set grafana to true in inventory
-```
-[cloud-user@bastion ~]$ vi openshift_inventory
-...
-openshift_grafana_state=present
-...
-```
-Run playbook for Grafana for OpenShift 3.9 and higher
-```
-[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-grafana/config.yml
-PLAY RECAP *****************************************************************************************
-infra0.ocp3.lab            : ok=0    changed=0    unreachable=0    failed=0
-localhost                  : ok=11   changed=0    unreachable=0    failed=0
-master0.ocp3.lab           : ok=70   changed=11   unreachable=0    failed=0
-node0.ocp3.lab             : ok=0    changed=0    unreachable=0    failed=0
-
-INSTALLER STATUS ***********************************************************************************
-Initialization             : Complete (0:01:13)
-Grafana Install            : Complete (0:02:12)
-```
-
-
 Install Logging
 Set logging to true in inventory
 ```
@@ -519,12 +431,7 @@ openshift_hosted_logging_deploy=true
 ...
 ```
 
-Run playbook for logging OpenShift 3.7
-```
-[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-logging.yml
-```
-
-Run Playbook for logging OpenShift 3.9 and higher
+Run Playbook for logging in OpenShift
 ```
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-logging/config.yml
 ```

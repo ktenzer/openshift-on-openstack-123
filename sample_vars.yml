@@ -30,9 +30,6 @@ openshift_passwd: <password>
 
 ### Red Hat Subscription ###
 ### This is only needed for openshift-enterprise ###
-bastion_repo: False
-rhn_local_repo: False
-rhn_local_repo_base_url: http://<ip address or hostname>
 subscription_use_username: True
 rhn_username_or_org_id: <user or org id>
 rhn_password_or_activation_key: <password or activation key>
@@ -56,19 +53,26 @@ master_flavor: ocp.master
 infra_flavor: ocp.infra
 node_flavor: ocp.node
 
+### Disconnected Installation Settings ###
+### Only needed if no access to internet ###
+### If access to internet ignore below settings ###
+bastion_repo: False
+rhn_local_repo: False
+rhn_local_repo_base_url: http://<ip address or hostname>
+
 ### Bastion repo for disconnected install ###
 upstream_registry: registry.redhat.io
 local_registry: bastion.local
 registry_tag: v3.11.16
 major_registry_tag: "v{{openshift_version}}"
-
 rclone_url: https://downloads.rclone.org/v1.44/rclone-v1.44-linux-amd64.rpm
-# Required swift containers
+
+### Required swift containers for disconnected install ###
 swift_rhn_repo_container_name: openshift_rhn_repo
 swift_rhn_registry_container_name: openshift_rhn_registry
 swift_openshift_rhn_repo_mount: /var/www/html/repo
 
-# Bastion local registry details
+### Bastion local registry details for disconnected install ###
 registry_config_dir: /registry
 registry_username: docker
 registry_password: registry
