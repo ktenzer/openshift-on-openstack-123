@@ -1,3 +1,4 @@
+#!/usr/bin/env ansible-playbook
 ---
 - name: Deploy the OpenShift Cluster Infrastructure
   hosts: localhost
@@ -12,10 +13,20 @@
     OS_USER_DOMAIN_NAME: Default
     OS_PROJECT_DOMAIN_NAME: Default
     OS_IDENTITY_API_VERSION: 3
+    OS_INTERFACE: public
 
   tasks:
+  - name: Include vars.yml
+    include_vars:
+      file: vars.yml
+
+  - name: Set ansible_ssh_private_key_file
+    set_fact:
+      ansible_ssh_private_key_file: "{{ ssh_key_path }}"
+
   - import_role:
       name: osp-stack-update
+
   - import_role:
       name: osp-inventory
 
