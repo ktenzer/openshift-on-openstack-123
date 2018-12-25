@@ -226,7 +226,7 @@ node_flavor: ocp.node
 
 Note: If you want to run a single load balancer (to save floating ips) for masters and infra, instead of default two use following heat template ```heat_template_path: /root/openshift-on-openstack-123/heat/openshift_single_lbaas.yaml```.
 
-Deploy OpenStack Infrastructure for OpenShift
+# Step 1: Deploy OpenStack Infrastructure for OpenShift
 ```
 # ./01_deploy-openstack-infra.yml -e vars.yml
 ```
@@ -299,7 +299,7 @@ Change dir to repository
 # cd openshift-on-openstack-123
 ```
 
-Prepare the nodes for deployment of OpenShift.
+# Step 2: Prepare the nodes for deployment of OpenShift.
 ```
 [cloud-user@bastion ~]$ ./02_prepare-openshift.yml -e @vars.yml
 
@@ -318,7 +318,7 @@ node1                      : ok=18   changed=13   unreachable=0    failed=0
 ![](images/three.png)
 
 ```[Bastion Host]```
-Deploy OpenShift
+# Step 3: Install and Configure OpenShift Cluster
 
 ```
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
@@ -364,7 +364,7 @@ Login in to UI.
 https://openshift.144.76.134.226.xip.io:8443
 ```
 
-# OKD
+# OKD Installation (in case you aren't doing OpenShift Entrerprise)
 OKD formally called OpenShift Origin (community version) is also supported starting with release-3.11 branch. To use OKD make sure you have a centos 7.5 image and set 'openshift_deployment=origin' in the vars file.
 
 Once you have run the 01_deploy-openstack-infra.yml and 03_prepare-openshift.yml playbooks as documented above run the following to install openshift OKD from bastion.
@@ -379,7 +379,8 @@ Deploy cluster playbook
 [centosr@bastion ~] ansible-playbook -i /home/centos/openshift-inventory openshift-ansible/playbooks/deploy_cluster.yml
 ```
 
-# Optional
+# Optional Section
+# Configure Admin User
 Configure admin user
 ```
 [cloud-user@bastion ~]$ ssh master0
@@ -395,7 +396,7 @@ Make user OpenShift Cluster Administrator
 [cloud-user@master0 ~]$ oc adm policy add-cluster-role-to-user cluster-admin admin
 ```
 
-Install Metrics
+# Install Metrics
 
 Note: Metrics is integrated with OpenShift UI and will be depricated in 4.0 but for 3.11 if you want metrics in UI it is still needed.
 
@@ -422,7 +423,7 @@ Initialization             : Complete (0:01:34)
 Metrics Install            : Complete (0:04:37)
 ```
 
-Install Logging
+# Install Logging
 Set logging to true in inventory
 ```
 [cloud-user@bastion ~]$ vi openshift_inventory
@@ -435,6 +436,54 @@ Run Playbook for logging in OpenShift
 ```
 [cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/openshift-logging/config.yml
 ```
+
+# Operator Framework (tech preview in 3.11)
+```
+[cloud-user@bastion ~]$ vi openshift_inventory
+...
+openshift_additional_registry_credentials=[{'host':'registry.connect.redhat.com','user':'<your_user_name>','password':'<your_password>','test_image':'mongodb/enterprise-operator:0.3.2'}]
+...
+```
+
+Reconfigure registry auth
+```
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/updates/registry_auth.yml
+PLAY RECAP ********************************************************************************************************************************************************************************************************
+infra0                     : ok=27   changed=1    unreachable=0    failed=0   
+infra1                     : ok=27   changed=1    unreachable=0    failed=0   
+localhost                  : ok=13   changed=0    unreachable=0    failed=0   
+master0                    : ok=48   changed=2    unreachable=0    failed=0   
+master1                    : ok=48   changed=2    unreachable=0    failed=0   
+master2                    : ok=65   changed=2    unreachable=0    failed=0   
+node0                      : ok=27   changed=1    unreachable=0    failed=0   
+node1                      : ok=27   changed=1    unreachable=0    failed=0   
+node2                      : ok=27   changed=1    unreachable=0    failed=0   
+
+
+INSTALLER STATUS **************************************************************************************************************************************************************************************************
+Initialization  : Complete (0:03:08)
+```
+
+Deploy Operator Framework
+```
+[cloud-user@bastion ~]$ ansible-playbook -i /home/cloud-user/openshift-inventory -vv /usr/share/ansible/openshift-ansible/playbooks/olm/config.yml
+PLAY RECAP ********************************************************************************************************************************************************************************************************
+infra0                     : ok=0    changed=0    unreachable=0    failed=0   
+infra1                     : ok=0    changed=0    unreachable=0    failed=0   
+localhost                  : ok=11   changed=0    unreachable=0    failed=0   
+master0                    : ok=27   changed=0    unreachable=0    failed=0   
+master1                    : ok=27   changed=0    unreachable=0    failed=0   
+master2                    : ok=68   changed=19   unreachable=0    failed=0   
+node0                      : ok=0    changed=0    unreachable=0    failed=0   
+node1                      : ok=0    changed=0    unreachable=0    failed=0   
+node2                      : ok=0    changed=0    unreachable=0    failed=0   
+
+
+INSTALLER STATUS **************************************************************************************************************************************************************************************************
+Initialization  : Complete (0:01:30)
+OLM Install     : Complete (0:00:47)
+```
+
 # Openshift disconnected install (optionally)
 Disconnected installation requires two Swift containers, which are used to store Docker images and RHEL repositories.
 ```01_deploy-openstack-infra.yml``` playbook will do the following:

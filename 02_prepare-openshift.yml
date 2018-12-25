@@ -1,0 +1,62 @@
+#!/usr/bin/env ansible-playbook 
+---
+- name: Inventory OpenShift Nodes
+  hosts: localhost
+  connection: local
+  become: no
+  gather_facts: no
+  environment:
+    OS_USERNAME: "{{ openstack_user }}"
+    OS_PASSWORD: "{{ openstack_passwd }}"
+    OS_AUTH_URL: "{{ openstack_auth_url }}"
+    OS_PROJECT_NAME: "{{ openstack_project }}"
+    OS_USER_DOMAIN_NAME: Default
+    OS_PROJECT_DOMAIN_NAME: Default
+    OS_IDENTITY_API_VERSION: 3
+
+  tasks:
+  - name: Include vars.yml
+    include_vars:
+      file: vars.yml
+  - import_role:
+      name: osp-inventory
+
+- name: Setup All OpenShift Nodes
+  hosts: all
+  gather_facts: yes
+  become: yes
+
+  tasks:
+  - name: Include vars.yml
+    include_vars:
+      file: vars.yml
+  - import_role:
+      name: redhat_subscription
+    when: openshift_deployment == "openshift-enterprise" and not rhn_local_repo
+  
+  - import_role:
+      name: all-prep
+
+- name: Setup All OpenShift Nodes
+  hosts: openshift
+  gather_facts: true
+  become: true
+
+  tasks:
+  - name: Include vars.yml
+    include_vars:
+      file: vars.yml
+  - import_role:
+      name: docker-prep
+
+- name: Configure OpenShift inventory file
+  hosts: bastion
+  gather_facts: true
+  become: true
+
+  tasks:
+  - name: Include vars.yml
+    include_vars:
+      file: vars.yml
+  - import_role:
+      name: ocp-inventory
