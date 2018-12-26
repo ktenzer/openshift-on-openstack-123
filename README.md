@@ -19,7 +19,7 @@ In addition I would like to metion I borrowed a lot of ideas from two other proj
 # Pre-requisites
 * Working OpenStack deployment. Tested is OpenStack 12 & 13 (Pike & Queens) using RDO.
 * RHEL 7 image. Tested is RHEL 7.4, 7.5, 7.6.
-* An openstack ssh key for accessing instances (Default /root/admin.pem, can be overridden).
+* An openstack ssh key for accessing instances
 * A provider (public) network with at least two or three available floating ips.
 * A service (internal) network
 * A router configured with the public network as gateway and internal network as interface.
@@ -190,7 +190,7 @@ Note: If you want to run a single load balancer (to save floating ips) for maste
 
 # Step 1: Deploy OpenStack Infrastructure for OpenShift
 ```
-# ./01_deploy-openstack-infra.yml
+# ./01_deploy-openstack-infra.yml --private-key=<path to openstack key for accessing instances>
 ```
 
 ![](images/two.png)
