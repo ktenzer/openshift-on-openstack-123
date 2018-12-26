@@ -448,26 +448,10 @@ bs-version=v2
 
 The post-openshift.yml playbook takes care of setting v2 for cinder automatically.
 
-## Issue 2: Service Catalog Install Fails
-
-This seems to be general issue with OpenShift 3.7 installer, somtimes API timeout's occur, it can be ignored or you can re-run playbook to install just service catalog.
-
-## Issue 3: Hosted Install Fails
+## Issue 2: Hosted Install Fails
 
 The registry sometimes fails to complete install due to host resolution of xip.io. Not sure if this is issue in OpenShift 3.7 or environment. Simply re-running hosted playbook resolved the issue and resulted in successful installation.
 
-## Issue 4: Firewalld Error when installing OpenShift 3.9
-
-RHEL 7.5 introduced some changes to firewalld. After installing firewalld, you actually need to reboot your system. The OpenShift 3.9 installer does not account for this, therefore after Step 2, before running OpenShift deployment reboot all nodes and then run OpenShift deployment.
-
-## Issue 5: Adding Datasource to Grafana Fails
-
-When installing the optional Garafana, adding the Prometheus datasource sometimes fails. This is an timing issue with the current playbook trying to access a route while its still being activated and will likely be fixed in a future version. Simply re-running the playbook resolved the issue and resulted in successful installation.
-
-## Issue 6: FQDNs cause OCP 3.10 install to fail
-
-Using FQDNs for masters, nodes or infras breaks OCP 3.10. Use short hostname only. Also ensure inventory file also only uses short hostname
-
-## Issue 7: Ansible 2.7 causes control plane to not start
+## Issue 3: Ansible 2.7 causes control plane to not start
 
 Don't use ansible 2.7 with OpenShift or OKD 3.11 there is an issue where etcd playbooks won't run which leads to control plane not starting. Use 2.6, this is tested and working. This deployment will force 2.6 so 2.7 doesnt end up on systems by accident.
