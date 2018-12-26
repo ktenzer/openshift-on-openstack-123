@@ -228,7 +228,7 @@ Note: If you want to run a single load balancer (to save floating ips) for maste
 
 # Step 1: Deploy OpenStack Infrastructure for OpenShift
 ```
-# ./01_deploy-openstack-infra.yml -e vars.yml
+# ./01_deploy-openstack-infra.yml
 ```
 
 ![](images/two.png)
@@ -301,7 +301,7 @@ Change dir to repository
 
 # Step 2: Prepare the nodes for deployment of OpenShift.
 ```
-[cloud-user@bastion ~]$ ./02_prepare-openshift.yml -e @vars.yml
+[cloud-user@bastion ~]$ ./02_prepare-openshift.yml
 
 PLAY RECAP *****************************************************************************************
 bastion                    : ok=15   changed=7    unreachable=0    failed=0
