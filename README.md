@@ -46,7 +46,6 @@ Multiple Master deployment is 3 Master, 2 Infra node and X number of App nodes. 
 
 # OpenStack Pre-Configuration (if required)
 
-```
 Setup New OpenStack Project
 
 Create Project
