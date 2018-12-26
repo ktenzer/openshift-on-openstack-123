@@ -8,7 +8,6 @@ We are happy to track and discuss ideas, topics and requests via 'Issues'.
 # Releases
 For each release of OpenShift a release branch will be created. Starting with OpenShift 3.9 we will follow the OpenShift release version so it is easy to tell what release branch goes with OpenShift version. The installer support OpenShift Enterprise and OKD starting with 3.11. Note: CentOS OKD rpms are released after enterprise so you may have to wait a bit for OKD.
 
-* release-1.0 OpenShift 3.7 and earlier
 * release-3.9 OpenShift 3.9
 * release-3.10 OpenShift 3.10
 * release-3.11 OpenShift 3.11
@@ -19,8 +18,8 @@ In addition I would like to metion I borrowed a lot of ideas from two other proj
 
 # Pre-requisites
 * Working OpenStack deployment. Tested is OpenStack 12 & 13 (Pike & Queens) using RDO.
-* RHEL 7 image. Tested is RHEL 7.4.
-* An openstack ssh key for accessing instances.
+* RHEL 7 image. Tested is RHEL 7.4, 7.5, 7.6.
+* An openstack ssh key for accessing instances (Default /root/admin.pem, can be overridden).
 * A provider (public) network with at least two or three available floating ips.
 * A service (internal) network
 * A router configured with the public network as gateway and internal network as interface.
@@ -47,41 +46,6 @@ Multiple Master deployment is 3 Master, 2 Infra node and X number of App nodes. 
 
 # OpenStack Pre-Configuration (if required)
 
-## Setup External Network
-You need an external floating ip network, and internal network and a router using the external network as gateway and internal network interface. In this case we will create the public network and router in the admin project and the internal network in a new project.
-
-Authenticate to admin project
-
-```
-# source /root/keystonerc_admin
-```
-
-Create public network
-
-```
-# openstack network create --provider-network-type flat \
---provider-physical-network extnet2 --external public
-```
-
-Create public subnet
-
-```
-# openstack subnet create --network public --allocation-pool \
-start=144.76.132.226,end=144.76.132.230 --no-dhcp \
---subnet-range 144.76.132.224/29 public_subnet
-```
-
-Create router
-
-```
-# openstack router create --no-ha router1
-
-```
-
-Set public network as gateway in router
-
-```
-# openstack router set --external-gateway public router1
 ```
 
 ## Setup New OpenStack Project
@@ -89,25 +53,25 @@ Set public network as gateway in router
 Create Project
 
 ```
-# openstack project create test
+# openstack project create openshift
 ```
 
 Add admin user as admin to project
 
 ```
-# openstack role add --project test --user admin admin
+# openstack role add --project openshift --user admin admin
 ```` 
 
 Increase project quota for security groups
 
 ```
-# openstack quota set --secgroups 100 test
+# openstack quota set --secgroups 100 openshift
 ```
 
 Increase quota for volumes
 
 ```
-#  openstack quota set --volumes 100 test
+#  openstack quota set --volumes 100 openshift
 ```
 
 ## Setup Internal Network
@@ -115,21 +79,21 @@ Increase quota for volumes
 Create internal network
 
 ```
-# openstack network create test
+# openstack network create openshift -- project openshift
 ```
 
 Create internal subnet
 
 ```
-# openstack subnet create --network test --allocation-pool \
+# openstack subnet create --network openshift --allocation-pool \
 start=192.168.4.100,end=192.168.4.200 --dns-nameserver 213.133.98.98 \
---subnet-range 192.168.4.0/24 test_subnet
+--subnet-range 192.168.4.0/24 openshift_subnet
 ```
 
 Add internal network to router as interface
 
 ```
-# openstack router add subnet router1 test_subnet
+# openstack router add subnet router1 openshift_subnet
 ```
 
 # OpenShift Authentication
@@ -137,7 +101,7 @@ This deployment will configure authentication through OpenStack keystone. This m
 
 Create OpenStack User for OpenShift
 ```
-# openstack user create --project admin --password redhat123 ktenzer
+# openstack user create --project admin --password <password> <username>
 ```
 
 # Install
@@ -176,12 +140,12 @@ Configure Parameters
 openstack_user: admin
 openstack_passwd: <password>
 openstack_auth_url: <openstack auth url>
-openstack_project: <project>
+openstack_project: openshift
 domain_name: ocp3.lab
 external_network: public
-service_network: mgmt
-service_subnet_id: 718f3675-55b9-498a-8c7b-e4eb2e41dde4
-image: rhel74
+service_network: openshift
+service_subnet_id: <openshift_subent id>
+image: rhel76
 ssh_user: cloud-user
 ssh_key_path: /root/admin.pem
 ssh_key_name: admin
@@ -235,61 +199,16 @@ Note: If you want to run a single load balancer (to save floating ips) for maste
 
 Get ip address of the bastion host.
 ```
-# openstack stack output show -f value -c output_value openshift ip_address
+# openstack stack output show openshift --all | grep -A1 '"name": "bastion"'
 
-{
-  "masters": [
-    {
-      "name": "master0",
-      "address": "192.168.1.19"
-    },
-    {
-      "name": "master1",
-      "address": "192.168.1.16"
-    },
-    {
-      "name": "master2",
-      "address": "192.168.1.15"
-    }
-  ],
-  "lb_master": {
-    "name": "lb_master",
-    "address": "144.76.134.230"
-  },
-  "infras": [
-    {
-      "name": "infra0",
-      "address": "192.168.1.10"
-    },
-    {
-      "name": "infra1",
-      "address": "192.168.1.11"
-    }
-  ],
-  "lb_infra": {
-    "name": "lb_infra",
-    "address": "144.76.134.229"
-  },
-  "bastion": {
-    "name": "bastion",
-    "address": "144.76.134.228"
-  },
-  "nodes": [
-    {
-      "name": "node0",
-      "address": "192.168.1.6"
-    },
-    {
-      "name": "node1",
-      "address": "192.168.1.13"
-    }
-  ]
-}
+| "name": "bastion",
+| "address": "1.2.3.4" 
+
 ```
 
 SSH to the bastion host using cloud-user and key.
 ```
-ssh -i /root/admin.pem cloud-user@144.76.134.229
+ssh -i /root/admin.pem cloud-user@1.2.3.4
 ```
 
 ```[Bastion Host]```
