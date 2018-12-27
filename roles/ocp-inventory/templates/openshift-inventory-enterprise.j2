@@ -29,6 +29,7 @@ openshift_clock_enabled=true
 openshift_use_crio=True
 openshift_use_crio_only=False
 openshift_crio_enable_docker_gc=True
+openshift_crio_var_sock='unix:///var/run/crio/crio.sock'
 
 # Set Domain for Apps
 openshift_master_default_subdomain=apps.{{ hostvars['infra0']['lb_infra'] }}.xip.io

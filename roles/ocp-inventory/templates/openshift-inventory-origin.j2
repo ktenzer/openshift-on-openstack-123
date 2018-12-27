@@ -19,6 +19,7 @@ openshift_clock_enabled=true
 openshift_use_crio=True
 openshift_use_crio_only=False
 openshift_crio_enable_docker_gc=True
+openshift_crio_var_sock='unix:///var/run/crio/crio.sock'
 
 # OKD Additional repos in case not released yet to centos
 #openshift_additional_repos=[{'id': 'centos-okd-ci', 'name': 'centos-okd-ci', 'baseurl' :'https://rpms.svc.ci.openshift.org/openshift-origin-v3.11', 'gpgcheck' :'0', 'enabled' :'1'}]
