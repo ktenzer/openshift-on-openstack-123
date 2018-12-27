@@ -30,18 +30,18 @@
 
 - name: Configure master nodes dynamically
   lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
-    line="{{ item }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_group_name='node-config-master'"
+    line="{{ item }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_group_name='node-config-master-crio'"
     insertafter="^#?\[nodes\]"
   with_items: "{{ groups['masters'] }}"
 
 - name: Configure infra nodes dynamically
   lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
-    line="{{ item }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_group_name='node-config-infra'"
+    line="{{ item }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_group_name='node-config-infra-crio'"
     insertafter="^#?{{ master_regex }}"
   with_items: "{{ groups['infras'] }}"
 
 - name: Configure app nodes dynamically
   lineinfile: dest=/home/{{ ssh_user }}/openshift-inventory
-    line="{{ item }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_group_name='node-config-compute'"
+    line="{{ item }} openshift_hostname={{ item }} openshift_schedulable=True openshift_node_group_name='node-config-compute-crio'"
     insertafter="^#?{{ infra_regex }}"
   with_items: "{{ groups['nodes'] }}"
