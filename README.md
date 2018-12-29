@@ -77,7 +77,7 @@ Increase quota for volumes
 Create internal network
 
 ```
-# openstack network create openshift -- project openshift
+# openstack network create openshift --project openshift
 ```
 
 Create internal subnet
