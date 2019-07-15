@@ -329,6 +329,22 @@ resources:
         protocol: udp
         port_range_min: 32769
         port_range_max: 32769
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 24007
+        port_range_max: 24007
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 24008
+        port_range_max: 24008
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 2222
+        port_range_max: 2222
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 49152
+        port_range_max: 49664 
 
   master_security_group:
     type: OS::Neutron::SecurityGroup
