@@ -7,20 +7,18 @@
 
 - name: Enable bastion specific repos (centos)
   yum:
-    name: "{{item}}"
+    name: "{{origin_repos_bastion}}"
     state: latest
   retries: 5
   delay: 5
-  with_items: "{{origin_repos_bastion}}"
   when: openshift_deployment == "origin"
 
 - name: Ensure that required packages are installed on bastion
   yum:
-    name: "{{item}}"
+    name: "{{packages}}"
     state: latest
   retries: 5
   delay: 5
-  with_items: "{{packages}}"
 
 - name: Perform yum update
   yum:
@@ -29,33 +27,29 @@
 
 - name: Install required openstack packages for bastion (redhat)
   yum:
-    name: "{{item}}"
+    name: "{{packages_bastion_openstack}}"
     state: installed
     disablerepo: rhel-7-fast-datapath-rpms
     disablerepo: rhel-7-server-ose-{{ openshift_version }}-rpms
-  with_items: "{{packages_bastion_openstack}}"
   when: openshift_deployment == "openshift-enterprise"
 
 - name: Install required openstack packages for bastion (centos)
   yum:
-    name: "{{item}}"
+    name: "{{packages_bastion_openstack}}"
     state: installed
-  with_items: "{{packages_bastion_openstack}}"
   when: openshift_deployment == "origin"
 
 - name: Install required installer packages for bastion (redhat)
   yum:
-    name: "{{item}}"
+    name: "{{packages_bastion_openshift}}"
     state: installed
     disablerepo: rhel-7-server-openstack-{{ openstack_version }}-tools-rpms
-  with_items: "{{ packages_bastion_openshift }}"
   when: openshift_deployment == "openshift-enterprise"
 
 - name: Install required installer packages for bastion (centos)
   yum:
-    name: "{{item}}"
+    name: "{{packages_bastion_origin}}"
     state: installed
-  with_items: "{{packages_bastion_origin}}"
   when: openshift_deployment == "origin"
 
 - name: Disable epel repository (centos)
