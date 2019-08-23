@@ -19,8 +19,9 @@ contact: admin@ocp3.lab
 heat_template_path: /root/openshift-on-openstack-123/heat/openshift_single_lbaas.yaml
 
 ### OpenShift Settings ###
-### Deployment can be openshift enterprise or origin for OKD ###
+### Deployment can be openshift-enterprise or origin for OKD ###
 openshift_deployment: openshift-enterprise
+openshift_repoversion: "311"
 openshift_version: "3.11"
 docker_version: "1.13.1"
 openshift_ha: false
