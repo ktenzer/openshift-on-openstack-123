@@ -8,17 +8,15 @@
 
 - name: Ensure that required packages are present on target hosts
   yum:
-    name: "{{item}}"
+    name: "{{packages}}"
     state: latest
   retries: 5
   delay: 5
-  with_items: "{{packages}}"
 
 - name: Install Required Packages
   yum:
-    name: "{{item}}"
+    name: "{{packages}}"
     state: installed
-  with_items: "{{packages}}"
 
 - name: Ensure NetworkManager is enabled and started
   systemd:
